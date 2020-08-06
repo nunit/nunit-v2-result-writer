@@ -13,7 +13,7 @@ var GITHUB_SITE = "https://github.com/nunit/nunit-v2-result-writer";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
 var NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
 var CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
-var VERSION = "3.6.0";
+var VERSION = "3.12.0-beta1";
 
 // Metadata used in the nuget and chocolatey packages
 var TITLE = "NUnit 3 - NUnit V2 Result Writer Extension";
@@ -202,6 +202,10 @@ Task("RePackageNuGet")
 	{
 		CreateDirectory(OUTPUT_DIR);
 
+		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+		var toolsSource  = BIN_SRC + "**/nunit-v2-result-writer.dll";
+		toolsSource = toolsSource.Replace("/", @"\");
+
         NuGetPack(
 			new NuGetPackSettings()
 			{
@@ -221,10 +225,12 @@ Task("RePackageNuGet")
 				Tags = TAGS,
 				//Language = "en-US",
 				OutputDirectory = OUTPUT_DIR,
+				KeepTemporaryNuSpecFile =true,
+				Verbosity = NuGetVerbosity.Detailed,
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = BIN_SRC + "nunit-v2-result-writer.dll", Target = "tools" }
+					new NuSpecContent { Source = toolsSource, Target = "tools" },
 				}
 			});
 	});
@@ -233,6 +239,12 @@ Task("RePackageChocolatey")
 	.Does(() =>
 	{
 		CreateDirectory(OUTPUT_DIR);
+
+		// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+		// https://github.com/cake-build/cake/issues/2367
+		// https://github.com/NuGet/Home/issues/3584
+		var toolsSource  = BIN_SRC + "**/nunit-v2-result-writer.dll";
+		toolsSource = toolsSource.Replace("/", @"\");
 
 		ChocolateyPack(
 			new ChocolateyPackSettings()
@@ -262,7 +274,7 @@ Task("RePackageChocolatey")
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = BIN_SRC + "nunit-v2-result-writer.dll", Target = "tools" }
+					new ChocolateyNuSpecContent { Source = toolsSource, Target = "tools" }
 				}
 			});
 	});
