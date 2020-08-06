@@ -1,5 +1,5 @@
 version: 3.5.{build}
-image: Visual Studio 2015
+image: Visual Studio 2019
 
 build_script:
   - ps: .\build.ps1 -Target "Appveyor"
