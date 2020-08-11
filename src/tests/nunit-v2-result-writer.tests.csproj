@@ -4,7 +4,7 @@
     <!-- If adding/updating TargetFrameworks, also update build.cake -->
     <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
     <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
-    <Configurations>Debug</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit-v2-result-writer.tests</AssemblyName>
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
