@@ -1,17 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- If adding/updating TargetFrameworks, also update build.cake -->
+    <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
+    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
     <Configurations>Debug</Configurations>
-    <TargetFrameworks>net20</TargetFrameworks>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit-v2-result-writer.tests</AssemblyName>
-    
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="nunit.engine.api" Version="3.11.1" />
-    <PackageReference Include="NUnit" Version="3.9.0" />
+
+    <!-- This is the newest NUnit that support .NET Framework 2.0 -->
+    <PackageReference Include="NUnit" Version="3.11.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\extension\nunit-v2-result-writer.csproj" />
