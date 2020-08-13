@@ -1,11 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit-v2-result-writer", "src\extension\nunit-v2-result-writer.csproj", "{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer", "src\extension\nunit-v2-result-writer.csproj", "{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nunit-v2-result-writer.tests", "src\tests\nunit-v2-result-writer.tests.csproj", "{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer.tests", "src\tests\nunit-v2-result-writer.tests.csproj", "{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5F2D8428-EF74-449E-ADD6-505D20751D12}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		appveyor.yml = appveyor.yml
+		build = build
+		build.cake = build.cake
+		build.cmd = build.cmd
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		NuGet.config = NuGet.config
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F9258C05-1EEA-485D-BC8E-69A1D6EFE5DC}
 	EndGlobalSection
 EndGlobal

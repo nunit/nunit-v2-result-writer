@@ -1,4 +1,4 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.7.0
+#tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 
 //////////////////////////////////////////////////////////////////////
 // PROJECT-SPECIFIC
@@ -8,12 +8,13 @@
 // main changes needed should be in this section.
 
 var SOLUTION_FILE = "nunit-v2-result-writer.sln";
+var OUTPUT_ASSEMBLY = "nunit-v2-result-writer.dll";
 var UNIT_TEST_ASSEMBLY = "nunit-v2-result-writer.tests.dll";
 var GITHUB_SITE = "https://github.com/nunit/nunit-v2-result-writer";
 var WIKI_PAGE = "https://github.com/nunit/docs/wiki/Console-Command-Line";
 var NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
 var CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
-var VERSION = "3.6.0";
+var VERSION = "3.7.0";
 
 // Metadata used in the nuget and chocolatey packages
 var TITLE = "NUnit 3 - NUnit V2 Result Writer Extension";
@@ -24,6 +25,11 @@ var SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 
 var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
 var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/master/CHANGES.txt" };
 var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
+var TARGET_FRAMEWORKS = new [] { "net20", "netcoreapp2.1" };
+
+// We don't support running tests built with .net core yet
+// var TEST_TARGET_FRAMEWORKS = TARGET_FRAMEWORKS
+var TEST_TARGET_FRAMEWORKS = new [] { "net20" };
 
 ////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -180,7 +186,7 @@ Task("Test")
 	.IsDependentOn("Build")
 	.Does(() =>
 	{
-		NUnit3(BIN_DIR + UNIT_TEST_ASSEMBLY);
+		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(BIN_DIR, framework, UNIT_TEST_ASSEMBLY)));
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -196,6 +202,12 @@ var PACKAGE_SOURCE_URL = new Uri( GITHUB_SITE );
 var BUG_TRACKER_URL = new Uri(GITHUB_SITE + "/issues");
 var DOCS_URL = new Uri(WIKI_PAGE);
 var MAILING_LIST_URL = new Uri("https://groups.google.com/forum/#!forum/nunit-discuss");
+
+// Nuspec-files don't handle forward slash in path in combination with recursive wildcards
+// https://github.com/cake-build/cake/issues/2367
+// https://github.com/NuGet/Home/issues/3584
+var TOOLS_SOURCE  = BIN_SRC + "**/" + OUTPUT_ASSEMBLY;
+TOOLS_SOURCE = TOOLS_SOURCE.Replace("/", @"\");
 
 Task("RePackageNuGet")
 	.Does(() => 
@@ -221,10 +233,11 @@ Task("RePackageNuGet")
 				Tags = TAGS,
 				//Language = "en-US",
 				OutputDirectory = OUTPUT_DIR,
+				KeepTemporaryNuSpecFile = false,
 				Files = new [] {
 					new NuSpecContent { Source = PROJECT_DIR + "LICENSE.txt" },
 					new NuSpecContent { Source = PROJECT_DIR + "CHANGES.txt" },
-					new NuSpecContent { Source = BIN_SRC + "nunit-v2-result-writer.dll", Target = "tools" }
+					new NuSpecContent { Source = TOOLS_SOURCE, Target = "tools" },
 				}
 			});
 	});
@@ -262,7 +275,7 @@ Task("RePackageChocolatey")
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = PROJECT_DIR + "VERIFICATION.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = BIN_SRC + "nunit-v2-result-writer.dll", Target = "tools" }
+					new ChocolateyNuSpecContent { Source = TOOLS_SOURCE, Target = "tools" }
 				}
 			});
 	});
