@@ -23,7 +23,7 @@ var OWNERS = new [] { "Charlie Poole" };
 var DESCRIPTION = "This extension allows NUnit to create result files in the V2 format, which is used by many CI servers.";
 var SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 format.";
 var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/master/CHANGES.txt" };
+var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.txt" };
 var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
 var TARGET_FRAMEWORKS = new [] { "net20", "netcoreapp2.1" };
 
@@ -68,7 +68,7 @@ if (BuildSystem.IsRunningOnAppVeyor)
 		var branch = AppVeyor.Environment.Repository.Branch;
 		var isPullRequest = AppVeyor.Environment.PullRequest.IsPullRequest;
 
-		if (branch == "master" && !isPullRequest)
+		if (branch == "main" && !isPullRequest)
 		{
 			packageVersion = VERSION + "-dev-" + buildNumber + dbgSuffix;
 		}
@@ -295,6 +295,11 @@ Task("Package")
 Task("RePackage")
 	.IsDependentOn("RePackageNuGet")
 	.IsDependentOn("RePackageChocolatey");
+
+Task("All")
+	.IsDependentOn("Build")
+	.IsDependentOn("Test")
+	.IsDependentOn("Package");
 
 Task("Appveyor")
 	.IsDependentOn("Build")
