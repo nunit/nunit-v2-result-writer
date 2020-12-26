@@ -16,21 +16,6 @@ var NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
 var CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
 var VERSION = "3.7.0";
 
-// Metadata used in the nuget and chocolatey packages
-var TITLE = "NUnit 3 - NUnit V2 Result Writer Extension";
-var AUTHORS = new [] { "Charlie Poole" };
-var OWNERS = new [] { "Charlie Poole" };
-var DESCRIPTION = "This extension allows NUnit to create result files in the V2 format, which is used by many CI servers.";
-var SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 format.";
-var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.txt" };
-var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
-var TARGET_FRAMEWORKS = new [] { "net20", "netcoreapp2.1" };
-
-// We don't support running tests built with .net core yet
-// var TEST_TARGET_FRAMEWORKS = TARGET_FRAMEWORKS
-var TEST_TARGET_FRAMEWORKS = new [] { "net20" };
-
 ////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
@@ -46,6 +31,30 @@ var configuration = Argument("configuration", "Debug");
 var nugetVersion = Argument("nugetVersion", (string)null);
 var chocoVersion = Argument("chocoVersion", (string)null);
 var binaries = Argument("binaries", (string)null);
+
+// Directories
+var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
+var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
+var BIN_SRC = BIN_DIR; // Source of binaries used in packaging
+var OUTPUT_DIR = PROJECT_DIR + "output/";
+var TOOLS_DIR = PROJECT_DIR + "tools/";
+
+// Metadata used in the nuget and chocolatey packages
+var TITLE = "NUnit 3 - NUnit V2 Result Writer Extension";
+var AUTHORS = new [] { "Charlie Poole" };
+var OWNERS = new [] { "Charlie Poole" };
+var DESCRIPTION = "This extension allows NUnit to create result files in the V2 format, which is used by many CI servers.";
+var SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 format.";
+var COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
+var RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.txt" };
+var TAGS = new [] { "nunit", "test", "testing", "tdd", "runner" };
+var TARGET_FRAMEWORKS = new [] { "net20", "netcoreapp2.1" };
+
+var CONSOLE_EXE = TOOLS_DIR + "NUnit.ConsoleRunner.3.11.1/tools/nunit3-console.exe";
+
+// We don't support running tests built with .net core yet
+// var TEST_TARGET_FRAMEWORKS = TARGET_FRAMEWORKS
+var TEST_TARGET_FRAMEWORKS = new [] { "net20" };
 
 //////////////////////////////////////////////////////////////////////
 // SET PACKAGE VERSION
@@ -97,12 +106,6 @@ if (BuildSystem.IsRunningOnAppVeyor)
 //////////////////////////////////////////////////////////////////////
 // DEFINE RUN CONSTANTS
 //////////////////////////////////////////////////////////////////////
-
-// Directories
-var PROJECT_DIR = Context.Environment.WorkingDirectory.FullPath + "/";
-var BIN_DIR = PROJECT_DIR + "bin/" + configuration + "/";
-var BIN_SRC = BIN_DIR; // Source of binaries used in packaging
-var OUTPUT_DIR = PROJECT_DIR + "output/";
 
 // Adjust BIN_SRC if --binaries option was given
 if (binaries != null)
@@ -179,14 +182,42 @@ Task("Build")
     });
 
 //////////////////////////////////////////////////////////////////////
+// SIMULATED INSTALLATION
+//////////////////////////////////////////////////////////////////////
+
+Task("SimulatedInstallation")
+	.IsDependentOn("Build")
+	.Does(() =>
+	{
+		string installDir = TOOLS_DIR + NUGET_ID + "/tools/";
+		CreateDirectory(installDir);
+		CleanDirectory(installDir);
+		CopyFileToDirectory(BIN_DIR + "net20/nunit-v2-result-writer.dll", installDir);
+	});
+
+//////////////////////////////////////////////////////////////////////
 // TEST
 //////////////////////////////////////////////////////////////////////
 
 Task("Test")
-	.IsDependentOn("Build")
+	.IsDependentOn("SimulatedInstallation")
 	.Does(() =>
 	{
-		NUnit3(TEST_TARGET_FRAMEWORKS.Select(framework => System.IO.Path.Combine(BIN_DIR, framework, UNIT_TEST_ASSEMBLY)));
+		string unitTests = System.IO.Path.Combine(BIN_DIR, System.IO.Path.Combine("net20", UNIT_TEST_ASSEMBLY));
+		string options = "--result:NUnit3TestResult.xml --result:NUnit2TestResult.xml;format=nunit2";
+
+		if (FileExists("NUnit3TestResult.xml"))
+			DeleteFile("NUnit3TestResult.xml");
+		if (FileExists("NUnit2TestResult.xml"))
+			DeleteFile("NUnit2TestResult.xml");
+
+		int rc = StartProcess(CONSOLE_EXE, $"{unitTests} {options}");
+		if (rc == 1)
+			throw new System.Exception($"{rc} test failed.");
+		else if (rc > 1)
+			throw new System.Exception($"{rc} tests failed.");
+		else if (rc < 0)
+			throw new System.Exception($"Error code {rc}.");
 	});
 
 //////////////////////////////////////////////////////////////////////

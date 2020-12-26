@@ -169,6 +169,8 @@ StyleCop.Cache
 local.settings.include
 InternalTrace.txt
 TestResult.xml
+NUnit3TestResult.xml
+NUnit2TestResult.xml
 testCaseCollection.xml
 deploy
 lib
