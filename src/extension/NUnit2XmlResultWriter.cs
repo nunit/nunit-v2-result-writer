@@ -81,16 +81,7 @@ namespace NUnit.Engine.Addins
         {
             NUnit2ResultSummary summary = new NUnit2ResultSummary(result);
 
-            XmlNode topLevelAssembly = null;
-            foreach (XmlNode child in result.ChildNodes)
-            {
-                if (child.Name == "test-suite" && child.GetAttribute("type") == "Assembly")
-                {
-                    topLevelAssembly = child;
-                    break;
-                }
-            }
-
+            XmlNode topLevelAssembly = result.SelectSingleNode("test-suite");
             if (topLevelAssembly == null)
                 throw new InvalidOperationException("Result contains no assemblies.");
 
@@ -113,7 +104,7 @@ namespace NUnit.Engine.Addins
             DateTime start = result.GetAttribute("start-time", DateTime.UtcNow);
             _xmlWriter.WriteAttributeString("date", start.ToString("yyyy-MM-dd"));
             _xmlWriter.WriteAttributeString("time", start.ToString("HH:mm:ss"));
-            WriteEnvironment(topLevelAssembly);
+            WriteEnvironment(topLevelAssembly.SelectSingleNode("environment").GetAttribute("framework-version"));
             WriteCultureInfo();
         }
 
@@ -127,10 +118,10 @@ namespace NUnit.Engine.Addins
             _xmlWriter.WriteEndElement();
         }
 
-        private void WriteEnvironment(XmlNode topLevelAssembly)
+        private void WriteEnvironment(string frameworkVersion)
         {
             _xmlWriter.WriteStartElement("environment");
-            _xmlWriter.WriteAttributeString("nunit-version", topLevelAssembly.FirstChild.GetAttribute("framework-version"));
+            _xmlWriter.WriteAttributeString("nunit-version", frameworkVersion);
             _xmlWriter.WriteAttributeString("clr-version", Environment.Version.ToString());
             _xmlWriter.WriteAttributeString("os-version", Environment.OSVersion.ToString());
             _xmlWriter.WriteAttributeString("platform", Environment.OSVersion.Platform.ToString());
@@ -244,7 +235,7 @@ namespace NUnit.Engine.Addins
             _xmlWriter.WriteAttributeString("executed", executed);
             _xmlWriter.WriteAttributeString("result", TranslateResult(resultState, label));
 
-            if (executed == "True")
+            if (executed == "True" || result.GetAttribute("site") == "Child")
             {
                 _xmlWriter.WriteAttributeString("success", success);
                 _xmlWriter.WriteAttributeString("time", duration.ToString("#####0.000", NumberFormatInfo.InvariantInfo));
