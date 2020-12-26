@@ -46,5 +46,10 @@ namespace NUnit.Engine.Addins
                     .With.Property("Name").EqualTo("Format")
                     .And.Property("Value").EqualTo("nunit2"));
         }
+
+        [Test, Ignore("Intentionally Ignored")]
+        public void IgnoredTest()
+        {
+        }
     }
 }
