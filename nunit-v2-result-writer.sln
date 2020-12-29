@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer.tests", "src\tests\nunit-v2-result-writer.tests.csproj", "{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5F2D8428-EF74-449E-ADD6-505D20751D12}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F2D8428-EF74-449E-ADD6-505D20751D12}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
 		appveyor.yml = appveyor.yml
@@ -16,10 +16,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5F2D8428
 		build.cmd = build.cmd
 		build.ps1 = build.ps1
 		build.sh = build.sh
+		net20.engine.addins = net20.engine.addins
 		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\mock-assembly\mock-assembly.csproj", "{6D160D73-AB70-47F3-9837-BB3A06125FFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{CE645163-A565-4C45-A9C5-4F66D67C13CC}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\constants.cake = scripts\constants.cake
+		scripts\packaging.cake = scripts\packaging.cake
+		scripts\parameters.cake = scripts\parameters.cake
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +50,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CE645163-A565-4C45-A9C5-4F66D67C13CC} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9258C05-1EEA-485D-BC8E-69A1D6EFE5DC}

@@ -1,0 +1,3 @@
+# Engines through 3.11.1 look in the tools directory to find extensions.
+# This file points them to the copy in the net20 subdirectory.
+./net20/nunit-v2-result-writer.dll

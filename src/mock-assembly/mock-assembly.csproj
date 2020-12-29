@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>NUnit.Tests</RootNamespace>
-    <TargetFramework>net45</TargetFramework>
-    <OutputPath>..\..\..\bin\$(Configuration)\</OutputPath>
-	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
