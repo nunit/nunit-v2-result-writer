@@ -104,8 +104,8 @@ namespace NUnit.Engine.Addins
             DateTime start = result.GetAttribute("start-time", DateTime.UtcNow);
             _xmlWriter.WriteAttributeString("date", start.ToString("yyyy-MM-dd"));
             _xmlWriter.WriteAttributeString("time", start.ToString("HH:mm:ss"));
-            //WriteEnvironment(topLevelAssembly.SelectSingleNode("environment").GetAttribute("framework-version"));
-            //WriteCultureInfo();
+            WriteEnvironment(topLevelAssembly.SelectSingleNode("environment").GetAttribute("framework-version"));
+            WriteCultureInfo();
         }
 
         private void WriteCultureInfo()

@@ -9,7 +9,7 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Debug");
 
-#load scripts/parameters.cake
+#load cake/parameters.cake
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN

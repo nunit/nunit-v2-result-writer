@@ -1,5 +1,7 @@
 ﻿#load "./constants.cake"
 #load "./packaging.cake"
+#load "./test-runner.cake"
+#load "./tests.cake"
 
 using System;
 

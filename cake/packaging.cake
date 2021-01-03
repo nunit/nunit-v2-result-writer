@@ -62,9 +62,11 @@ public abstract class PackageTester
     {
 		foreach (string consoleVersion in _parameters.SupportedConsoleVersions)
 		{
+			Banner($"Testing {MOCK_ASSEMBLY} under NUnit3-Console {consoleVersion}");
 			RunMockAssemblyTests(consoleVersion);
 
-			VerifyResultFile(NUNIT2_RESULT_FILE);
+			Banner($"Verifying {NUNIT2_RESULT_FILE}");
+			TestRunner.Run(typeof(ResultWriterTests));
 		}
 	}
 
@@ -75,10 +77,6 @@ public abstract class PackageTester
 
 	private void RunMockAssemblyTests(string consoleVersion)
     {
-		_context.Information("=======================================================");
-		_context.Information($"Testing {MOCK_ASSEMBLY} under NUnit3-Console {consoleVersion}");
-		_context.Information("=======================================================");
-
 		string runner = _parameters.GetPathToConsoleRunner(consoleVersion);
 
 		if (InstallDirectory.EndsWith(CHOCO_ID + "/"))
@@ -116,27 +114,14 @@ public abstract class PackageTester
 		}
 	}
 
-	private void VerifyResultFile(string resultFile)
-    {
+	private void Banner(string message)
+	{
+		_context.Information("\n=======================================================");
+		_context.Information(message);
 		_context.Information("=======================================================");
-		_context.Information($"Verifying {resultFile}");
-		_context.Information("=======================================================");
-
-		var doc = new XmlDocument();
-		doc.Load(resultFile);
-
-		_context.Information("Verifying <test-results> node...");
-		XmlNode testResult = doc.DocumentElement;
-		if (testResult.Name != "test-results")
-			throw new System.Exception($"Expected <test-results> but was <{testResult.Name}>");
-
-		_context.Information("Verifying top-level <test-suite>...");
-		if (testResult.FirstChild.Name != "test-suite")
-			throw new System.Exception("Top level test suite not found");
-
-		_context.Information("Verification was successful!");
-    }
+	}
 }
+
 
 public class NuGetPackageTester : PackageTester
 {
