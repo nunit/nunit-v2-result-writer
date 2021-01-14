@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer.tests", "src\tests\nunit-v2-result-writer.tests.csproj", "{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5F2D8428-EF74-449E-ADD6-505D20751D12}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F2D8428-EF74-449E-ADD6-505D20751D12}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
 		appveyor.yml = appveyor.yml
@@ -16,7 +16,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5F2D8428
 		build.cmd = build.cmd
 		build.ps1 = build.ps1
 		build.sh = build.sh
+		net20.engine.addins = net20.engine.addins
 		NuGet.config = NuGet.config
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\mock-assembly\mock-assembly.csproj", "{6D160D73-AB70-47F3-9837-BB3A06125FFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21}"
+	ProjectSection(SolutionItems) = preProject
+		cake\assertions.cake = cake\assertions.cake
+		cake\constants.cake = cake\constants.cake
+		cake\constraints.cake = cake\constraints.cake
+		cake\packaging.cake = cake\packaging.cake
+		cake\parameters.cake = cake\parameters.cake
+		cake\test-runner.cake = cake\test-runner.cake
+		cake\tests.cake = cake\tests.cake
 	EndProjectSection
 EndProject
 Global
@@ -33,9 +47,16 @@ Global
 		{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D160D73-AB70-47F3-9837-BB3A06125FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D160D73-AB70-47F3-9837-BB3A06125FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D160D73-AB70-47F3-9837-BB3A06125FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D160D73-AB70-47F3-9837-BB3A06125FFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9258C05-1EEA-485D-BC8E-69A1D6EFE5DC}
