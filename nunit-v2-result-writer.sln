@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\mock-a
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21}"
 	ProjectSection(SolutionItems) = preProject
-		cake\assert.cake = cake\assert.cake
+		cake\assertions.cake = cake\assertions.cake
 		cake\constants.cake = cake\constants.cake
 		cake\constraints.cake = cake\constraints.cake
 		cake\packaging.cake = cake\packaging.cake
