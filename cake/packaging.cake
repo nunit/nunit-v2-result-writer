@@ -46,28 +46,28 @@ public abstract class PackageTester
 	public abstract PackageCheck[] PackageChecks { get; }
 	public PackageTest[] PackageTests = new PackageTest[]
 	{
-		//new PackageTest()
-		//{
-		//	Description = "Run mock-assembly under 3.10.0 console",
-		//	Files = new [] {
-		//		$"bin/Release/net20/mock-assembly.dll" },
-		//	ConsoleVersion = "3.10.0"
-		//},
-		//new PackageTest()
-		//{
-		//	Description = "Run mock-assembly under 3.11.1 console",
-		//	Files = new [] {
-		//		$"bin/Release/net20/mock-assembly.dll" },
-		//	ConsoleVersion = "3.11.1"
-		//},
-		//new PackageTest()
-		//{
-		//	Description = "Run two copies of mock-assembly under 3.11.1 console",
-		//	Files = new [] {
-		//		$"bin/Release/net20/mock-assembly.dll",
-		//		$"bin/Release/net20/mock-assembly.dll" },
-		//	ConsoleVersion = "3.11.1"
-		//},
+		new PackageTest()
+		{
+			Description = "Run mock-assembly under 3.10.0 console",
+			Files = new [] {
+				$"bin/Release/net20/mock-assembly.dll" },
+			ConsoleVersion = "3.10.0"
+		},
+		new PackageTest()
+		{
+			Description = "Run mock-assembly under 3.11.1 console",
+			Files = new [] {
+				$"bin/Release/net20/mock-assembly.dll" },
+			ConsoleVersion = "3.11.1"
+		},
+		new PackageTest()
+		{
+			Description = "Run two copies of mock-assembly under 3.11.1 console",
+			Files = new [] {
+				$"bin/Release/net20/mock-assembly.dll",
+				$"bin/Release/net20/mock-assembly.dll" },
+			ConsoleVersion = "3.11.1"
+		},
 		new PackageTest()
 		{
 			Description = "Run NUnit project with files under 3.11.1 console",
