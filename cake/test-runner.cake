@@ -5,6 +5,11 @@ using System.Reflection;
 
 //////////////////////////////////////////////////////////////////////
 // A tiny test framework for use in cake scripts.
+//
+// NOTE: This is an experiment, so it currently only handles a very
+// limited set of constraints and assertions needed by this project.
+// Eventiually, I'll combine various experiments in this and other
+// projects to a Cake version of TC-Lite.
 //////////////////////////////////////////////////////////////////////
 
 public static class TestRunner

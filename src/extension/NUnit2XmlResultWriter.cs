@@ -77,8 +77,8 @@ namespace NUnit.Engine.Addins
         {
             NUnit2ResultSummary summary = new NUnit2ResultSummary(result);
 
-            XmlNode topLevelAssembly = result.SelectSingleNode("test-suite");
-            if (topLevelAssembly == null)
+            XmlNodeList assemblies = result.SelectNodes("//test-suite[@type='Assembly']");
+            if (assemblies.Count == 0)
                 throw new InvalidOperationException("Result contains no assemblies.");
 
             _xmlWriter.WriteStartDocument(false);
@@ -87,7 +87,7 @@ namespace NUnit.Engine.Addins
             _xmlWriter.WriteStartElement("test-results");
 
             // ERROR: Use attribute from ntop level child environment element here
-            _xmlWriter.WriteAttributeString("name", topLevelAssembly.GetAttribute("fullname") ?? "UNKNOWN");
+            _xmlWriter.WriteAttributeString("name", assemblies[0].GetAttribute("fullname") ?? "UNKNOWN");
             _xmlWriter.WriteAttributeString("total", summary.ResultCount.ToString());
             _xmlWriter.WriteAttributeString("errors", summary.Errors.ToString());
             _xmlWriter.WriteAttributeString("failures", summary.Failures.ToString());
@@ -100,7 +100,7 @@ namespace NUnit.Engine.Addins
             DateTime start = result.GetAttribute("start-time", DateTime.UtcNow);
             _xmlWriter.WriteAttributeString("date", start.ToString("yyyy-MM-dd"));
             _xmlWriter.WriteAttributeString("time", start.ToString("HH:mm:ss"));
-            WriteEnvironment(topLevelAssembly.SelectSingleNode("environment").GetAttribute("framework-version"));
+            WriteEnvironment(assemblies[0].SelectSingleNode("environment")?.GetAttribute("framework-version"));
             WriteCultureInfo();
         }
 

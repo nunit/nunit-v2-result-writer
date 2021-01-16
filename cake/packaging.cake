@@ -46,25 +46,35 @@ public abstract class PackageTester
 	public abstract PackageCheck[] PackageChecks { get; }
 	public PackageTest[] PackageTests = new PackageTest[]
 	{
+		//new PackageTest()
+		//{
+		//	Description = "Run mock-assembly under 3.10.0 console",
+		//	Files = new [] {
+		//		$"bin/Release/net20/mock-assembly.dll" },
+		//	ConsoleVersion = "3.10.0"
+		//},
+		//new PackageTest()
+		//{
+		//	Description = "Run mock-assembly under 3.11.1 console",
+		//	Files = new [] {
+		//		$"bin/Release/net20/mock-assembly.dll" },
+		//	ConsoleVersion = "3.11.1"
+		//},
+		//new PackageTest()
+		//{
+		//	Description = "Run two copies of mock-assembly under 3.11.1 console",
+		//	Files = new [] {
+		//		$"bin/Release/net20/mock-assembly.dll",
+		//		$"bin/Release/net20/mock-assembly.dll" },
+		//	ConsoleVersion = "3.11.1"
+		//},
 		new PackageTest()
 		{
-			ConsoleVersion = "3.10.0",
-			Assemblies = new [] {
-				$"bin/Release/net20/mock-assembly.dll" }
+			Description = "Run NUnit project with files under 3.11.1 console",
+			Files = new [] {
+				$"TwoMockAssemblies.nunit" },
+			ConsoleVersion = "3.11.1"
 		},
-		new PackageTest()
-		{
-			ConsoleVersion = "3.11.1",
-			Assemblies = new [] {
-				$"bin/Release/net20/mock-assembly.dll" }
-		},
-		new PackageTest()
-		{
-			ConsoleVersion = "3.11.1",
-			Assemblies = new [] {
-				$"bin/Release/net20/mock-assembly.dll",
-				$"bin/Release/net20/mock-assembly.dll" }
-		}
 	};
 
 	public void InstallPackage()
@@ -84,11 +94,10 @@ public abstract class PackageTester
     {
 		foreach (var packageTest in PackageTests)
 		{
-			var consoleVersion = packageTest.ConsoleVersion;
-			Banner($"Running test under NUnit3-Console {consoleVersion}");
-			RunConsoleTests(consoleVersion, packageTest.Assemblies);
+			Banner(packageTest.Description);
+			RunConsoleTests(packageTest.ConsoleVersion, packageTest.Files);
 
-			Banner($"Verifying {NUNIT2_RESULT_FILE}");
+			Banner($"Verifying contents of {NUNIT2_RESULT_FILE}");
 			TestRunner.Run(typeof(ResultWriterTests));
 		}
 	}
@@ -147,8 +156,9 @@ public abstract class PackageTester
 
 public class PackageTest
 {
+	public string Description { get; set; }
+	public string[] Files { get; set; }
 	public string ConsoleVersion { get; set; }
-	public string[] Assemblies { get; set; }
 }
 
 public class NuGetPackageTester : PackageTester

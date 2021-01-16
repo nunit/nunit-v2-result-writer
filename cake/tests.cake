@@ -13,14 +13,14 @@ public class ResultWriterTests
     const int INVALID = 3;
 
     XmlNode Fixture;
-    XmlNodeList TopLevelSuites;
+    XmlNodeList Assemblies;
 
     public ResultWriterTests()
     {
         var doc = new XmlDocument();
         doc.Load("NUnit2TestResult.xml");
         Fixture = doc.DocumentElement;
-        TopLevelSuites = Fixture.SelectNodes("test-suite");
+        Assemblies = Fixture.SelectNodes("//test-suite[@type='Assembly']");
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class ResultWriterTests
         Assert.That(Fixture.Name, Is.EqualTo("test-results"));
         Assert.That(Fixture, Has.One.Element("environment"));
         Assert.That(Fixture, Has.One.Element("culture-info"));
-        Assert.That(TopLevelSuites.Count, Is.GreaterThan(0));
+        Assert.That(Assemblies.Count, Is.GreaterThan(0));
     }
 
     [Test]
@@ -57,7 +57,7 @@ public class ResultWriterTests
     [Test]
     public void TestResultsElement()
     {
-        int n = TopLevelSuites.Count;
+        int n = Assemblies.Count;
         Assert.That(Fixture, Has.Attribute("name").EqualTo("mock-assembly.dll"));
         Assert.That(Fixture, Has.Attribute("total").EqualTo((TOTAL*n).ToString()));
         Assert.That(Fixture, Has.Attribute("errors").EqualTo((ERRORS*n).ToString()));
@@ -74,7 +74,7 @@ public class ResultWriterTests
     [Test]
     public void TopLevelTestSuites()
     {
-        foreach (XmlNode suite in TopLevelSuites)
+        foreach (XmlNode suite in Assemblies)
         {
             Assert.That(suite, Has.Attribute("type").EqualTo("Assembly"));
             Assert.That(suite, Has.Attribute("name").EqualTo("mock-assembly.dll"));
