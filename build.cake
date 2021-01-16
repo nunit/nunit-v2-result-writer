@@ -113,7 +113,7 @@ Task("PackageNuGet")
 
 		tester.InstallPackage();
 		tester.VerifyPackage();
-		tester.TestPackage();
+		tester.RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
 		tester.UninstallPackage();
@@ -131,7 +131,7 @@ Task("PackageChocolatey")
 
 		tester.InstallPackage();
 		tester.VerifyPackage();
-		tester.TestPackage();
+		tester.RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
 		tester.UninstallPackage();

@@ -27,6 +27,27 @@ public class EqualConstraint<TActual> : Constraint<TActual>
     }
 }
 
+public class GreaterThanConstraint<TActual> : Constraint<TActual> where TActual : IComparable
+{
+    // Expected and actual types must match, possibly through conversion
+    private TActual _expected;
+
+    public GreaterThanConstraint(TActual expected)
+    {
+        _expected = expected;
+    }
+
+    public override bool Matches(TActual actual)
+    {
+        if (actual.CompareTo(_expected) > 0)
+            return true;
+
+        Message = $"Expected: value > {VAL(_expected)} But was: {VAL(actual)}";
+
+        return false;
+    }
+}
+
 public class XmlElementConstraint : Constraint<XmlNode>
 {
     private string _name;
@@ -40,7 +61,7 @@ public class XmlElementConstraint : Constraint<XmlNode>
 
     public override bool Matches(XmlNode actual)
     {
-        var elements = actual.SelectNodes(_name);
+        XmlNodeList elements = actual.SelectNodes(_name);
 
         if (_expectedCount < 0) // No count specified
         {
@@ -49,6 +70,8 @@ public class XmlElementConstraint : Constraint<XmlNode>
                 Message = $"Expected element <{_name}> was not found.";
                 return false;
             }
+
+            Message = $"Element <{actual.Name}> contains an element <{_name}>";
         }
         else // Count was specified
         {
@@ -57,6 +80,8 @@ public class XmlElementConstraint : Constraint<XmlNode>
                 Message = $"Expected {_expectedCount} <{_name}> elements but found {elements.Count}.";
                 return false;
             }
+
+            Message = $"Element {actual.Name} has exactly {elements.Count} {_name} elements.";
         }
 
         return true;
@@ -105,12 +130,17 @@ public class XmlAttributeConstraint : Constraint<XmlNode>
 public static class Is
 {
     public static EqualConstraint<T> EqualTo<T>(T expected) => new EqualConstraint<T>(expected);
+    public static GreaterThanConstraint<T> GreaterThan<T>(T expected) where T : IComparable
+    {
+        return new GreaterThanConstraint<T>(expected);
+    }
 }
 
 public static class Has
 {
     public static XmlElementConstraint Element(string name, int expectedCount = -1) => new XmlElementConstraint(name, expectedCount);
     public static XmlAttributeConstraint Attribute(string name) => new XmlAttributeConstraint(name);
+    public static HasExactly Exactly(int count) => new HasExactly(count);
     public static HasExactly One => new HasExactly(1);
 
     public class HasExactly

@@ -1,25 +1,39 @@
-public static class ResultWriterTests
+public class ResultWriterTests
 {
-    static XmlNode Fixture;
+    // NOTE: These test assume that we are only loading mock-assembly.dll in one
+    // or more copies. If other assemblies are to be used, then we will need to
+    // specify the expected results as part of package test.
+    const int TOTAL = 31;
+    const int ERRORS = 1;
+    const int FAILURES = 1;
+    const int NOTRUN = 10;
+    const int INCONCLUSIVE = 1;
+    const int IGNORED = 4;
+    const int SKIPPED = 3;
+    const int INVALID = 3;
 
-    static ResultWriterTests()
+    XmlNode Fixture;
+    XmlNodeList TopLevelSuites;
+
+    public ResultWriterTests()
     {
         var doc = new XmlDocument();
         doc.Load("NUnit2TestResult.xml");
         Fixture = doc.DocumentElement;
+        TopLevelSuites = Fixture.SelectNodes("test-suite");
     }
 
     [Test]
-    public static void TopLevelHierarchy()
+    public void TopLevelHierarchy()
     {
         Assert.That(Fixture.Name, Is.EqualTo("test-results"));
         Assert.That(Fixture, Has.One.Element("environment"));
         Assert.That(Fixture, Has.One.Element("culture-info"));
-        Assert.That(Fixture, Has.One.Element("test-suite"));
+        Assert.That(TopLevelSuites.Count, Is.GreaterThan(0));
     }
 
     [Test]
-    public static void TestSuitesHaveOneResultsElement()
+    public void TestSuitesHaveOneResultsElement()
     {
         var suites = Fixture.SelectNodes("//test-suite");
         Assert.That(suites.Count > 0, "No <test-suite> elements found in file");
@@ -33,7 +47,7 @@ public static class ResultWriterTests
     }
 
     [Test]
-    public static void TestCasesHaveResultsElementAsParent()
+    public void TestCasesHaveResultsElementAsParent()
     {
         var testCases = Fixture.SelectNodes("//test-case");
         foreach (XmlNode testCase in testCases)
@@ -41,36 +55,39 @@ public static class ResultWriterTests
     }
 
     [Test]
-    public static void TestResultsElement()
+    public void TestResultsElement()
     {
+        int n = TopLevelSuites.Count;
         Assert.That(Fixture, Has.Attribute("name").EqualTo("mock-assembly.dll"));
-        Assert.That(Fixture, Has.Attribute("total").EqualTo("31"));
-        Assert.That(Fixture, Has.Attribute("errors").EqualTo("1"));
-        Assert.That(Fixture, Has.Attribute("failures").EqualTo("1"));
-        Assert.That(Fixture, Has.Attribute("not-run").EqualTo("10"));
-        Assert.That(Fixture, Has.Attribute("inconclusive").EqualTo("1"));
-        Assert.That(Fixture, Has.Attribute("ignored").EqualTo("4"));
-        Assert.That(Fixture, Has.Attribute("skipped").EqualTo("3"));
-        Assert.That(Fixture, Has.Attribute("invalid").EqualTo("3"));
+        Assert.That(Fixture, Has.Attribute("total").EqualTo((TOTAL*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("errors").EqualTo((ERRORS*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("failures").EqualTo((FAILURES*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("not-run").EqualTo((NOTRUN*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("inconclusive").EqualTo((INCONCLUSIVE*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("ignored").EqualTo((IGNORED*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("skipped").EqualTo((SKIPPED*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("invalid").EqualTo((INVALID*n).ToString()));
         Assert.That(Fixture, Has.Attribute("date"));
         Assert.That(Fixture, Has.Attribute("time"));
     }
 
     [Test]
-    public static void TopLevelTestSuite()
+    public void TopLevelTestSuites()
     {
-        XmlNode suite = Fixture.SelectSingleNode("test-suite");
-        Assert.That(suite, Has.Attribute("type").EqualTo("Assembly"));
-        Assert.That(suite, Has.Attribute("name").EqualTo("mock-assembly.dll"));
-        Assert.That(suite, Has.Attribute("executed").EqualTo("True"));
-        Assert.That(suite, Has.Attribute("result").EqualTo("Failure"));
-        Assert.That(suite, Has.Attribute("success").EqualTo("False"));
-        Assert.That(suite, Has.Attribute("time"));
-        Assert.That(suite, Has.Attribute("asserts").EqualTo("2"));
+        foreach (XmlNode suite in TopLevelSuites)
+        {
+            Assert.That(suite, Has.Attribute("type").EqualTo("Assembly"));
+            Assert.That(suite, Has.Attribute("name").EqualTo("mock-assembly.dll"));
+            Assert.That(suite, Has.Attribute("executed").EqualTo("True"));
+            Assert.That(suite, Has.Attribute("result").EqualTo("Failure"));
+            Assert.That(suite, Has.Attribute("success").EqualTo("False"));
+            Assert.That(suite, Has.Attribute("time"));
+            Assert.That(suite, Has.Attribute("asserts").EqualTo("2"));
+        }
     }
 
     [Test]
-    public static void EnvironmentElement()
+    public void EnvironmentElement()
     {
         XmlNode environment = Fixture.SelectSingleNode("environment");
         Assert.That(environment, Has.Attribute("nunit-version").EqualTo("3.11.0.0"));
@@ -84,7 +101,7 @@ public static class ResultWriterTests
     }
 
     [Test]
-    public static void CultureInfoElement()
+    public void CultureInfoElement()
     {
         XmlNode cultureInfo = Fixture.SelectSingleNode("culture-info");
         Assert.That(cultureInfo, Has.Attribute("current-culture"));

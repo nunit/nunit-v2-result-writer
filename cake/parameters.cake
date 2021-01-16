@@ -82,14 +82,6 @@ public class BuildParameters
 	public string NuGetPackage => PackageDirectory + NUGET_ID + "." + PackageVersion + ".nupkg";
 	public string ChocolateyPackage => PackageDirectory + CHOCO_ID + "." + PackageVersion + ".nupkg";
 
-	// These are all used for the package tests. There must be
-	// a #tool directive for each one at the start of this file.
-	public string[] SupportedConsoleVersions => new string[] {
-		"3.10.0",
-		"3.11.1",
-		//"3.12.0-beta1"
-	};
-
 	public string GetPathToConsoleRunner(string version)
 	{
 		return ToolsDirectory + "NUnit.ConsoleRunner." + version + "/tools/nunit3-console.exe";

@@ -69,11 +69,7 @@ namespace NUnit.Engine.Addins
             _xmlWriter = xmlWriter;
 
             InitializeXmlFile(result);
-
-            foreach (XmlNode child in result.ChildNodes)
-                if (child.Name.StartsWith("test-"))
-                    WriteResultElement(child);
-
+            WriteChildElements(result);
             TerminateXmlFile();
         }
 
@@ -306,13 +302,17 @@ namespace NUnit.Engine.Addins
         private void WriteChildResults(XmlNode result)
         {
             _xmlWriter.WriteStartElement("results");
+            WriteChildElements(result);
+            _xmlWriter.WriteEndElement();
+        }
 
+        private void WriteChildElements(XmlNode result)
+        {
             foreach (XmlNode childResult in result.ChildNodes)
                 if (childResult.Name.StartsWith("test-"))
                     WriteResultElement(childResult);
-
-            _xmlWriter.WriteEndElement();
         }
+
         #endregion
 
         #region Output Helpers
