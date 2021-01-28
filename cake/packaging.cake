@@ -27,11 +27,11 @@ static readonly Uri MAILING_LIST_URL = new Uri("https://groups.google.com/forum/
 // PACKAGE TESTER
 //////////////////////////////////////////////////////////////////////
 
+const string NUNIT3_RESULT_FILE = "NUnit3TestResult.xml";
+const string NUNIT2_RESULT_FILE = "NUnit2TestResult.xml";
+
 public abstract class PackageTester
 {
-	static readonly string NUNIT3_RESULT_FILE = "NUnit3TestResult.xml";
-	static readonly string NUNIT2_RESULT_FILE = "NUnit2TestResult.xml";
-
 	protected BuildParameters _parameters;
 	protected ICakeContext _context;
 
@@ -98,7 +98,7 @@ public abstract class PackageTester
 			RunConsoleTests(packageTest.ConsoleVersion, packageTest.Files);
 
 			Banner($"Verifying contents of {NUNIT2_RESULT_FILE}");
-			TestRunner.Run(typeof(ResultWriterTests));
+			TestRunner.Run(typeof(ResultWriterTests), typeof(SchemaValidationTests));
 		}
 	}
 

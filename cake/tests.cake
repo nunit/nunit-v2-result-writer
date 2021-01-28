@@ -1,3 +1,5 @@
+const string NUNIT2_RESULT_SCHEMA = "NUnit2Results.xsd";
+
 public class ResultWriterTests
 {
     // NOTE: These test assume that we are only loading mock-assembly.dll in one
@@ -18,7 +20,7 @@ public class ResultWriterTests
     public ResultWriterTests()
     {
         var doc = new XmlDocument();
-        doc.Load("NUnit2TestResult.xml");
+        doc.Load(NUNIT2_RESULT_FILE);
         Fixture = doc.DocumentElement;
         Assemblies = Fixture.SelectNodes("//test-suite[@type='Assembly']");
     }
@@ -59,14 +61,14 @@ public class ResultWriterTests
     {
         int n = Assemblies.Count;
         Assert.That(Fixture, Has.Attribute("name").EqualTo("mock-assembly.dll"));
-        Assert.That(Fixture, Has.Attribute("total").EqualTo((TOTAL*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("errors").EqualTo((ERRORS*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("failures").EqualTo((FAILURES*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("not-run").EqualTo((NOTRUN*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("inconclusive").EqualTo((INCONCLUSIVE*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("ignored").EqualTo((IGNORED*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("skipped").EqualTo((SKIPPED*n).ToString()));
-        Assert.That(Fixture, Has.Attribute("invalid").EqualTo((INVALID*n).ToString()));
+        Assert.That(Fixture, Has.Attribute("total").EqualTo((TOTAL * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("errors").EqualTo((ERRORS * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("failures").EqualTo((FAILURES * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("not-run").EqualTo((NOTRUN * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("inconclusive").EqualTo((INCONCLUSIVE * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("ignored").EqualTo((IGNORED * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("skipped").EqualTo((SKIPPED * n).ToString()));
+        Assert.That(Fixture, Has.Attribute("invalid").EqualTo((INVALID * n).ToString()));
         Assert.That(Fixture, Has.Attribute("date"));
         Assert.That(Fixture, Has.Attribute("time"));
     }
@@ -106,5 +108,91 @@ public class ResultWriterTests
         XmlNode cultureInfo = Fixture.SelectSingleNode("culture-info");
         Assert.That(cultureInfo, Has.Attribute("current-culture"));
         Assert.That(cultureInfo, Has.Attribute("current-uiculture"));
+    }
+}
+
+public class SchemaValidationTests
+{
+    [Test]
+    public void ValidateAgainstSchema()
+    {
+        SchemaValidator validator = new SchemaValidator(NUNIT2_RESULT_FILE, NUNIT2_RESULT_SCHEMA);
+        Assert.That(validator.Validate(), "validate failed");
+    }
+}
+
+using System.Xml.Schema;
+
+public class SchemaValidator
+{
+    [Obsolete]
+    private XmlValidatingReader myXmlValidatingReader;
+    private bool success;
+
+    [Obsolete]
+    public SchemaValidator(string xmlFile, string schemaFile)
+    {
+        XmlSchemaCollection myXmlSchemaCollection = new XmlSchemaCollection();
+        XmlTextReader xmlTextReader = new XmlTextReader(schemaFile);
+        try
+        {
+            myXmlSchemaCollection.Add(XmlSchema.Read(xmlTextReader, null));
+        }
+        finally
+        {
+            xmlTextReader.Close();
+        }
+
+        // Validate the XML file with the schema
+        XmlTextReader myXmlTextReader = new XmlTextReader(xmlFile);
+        myXmlValidatingReader = new XmlValidatingReader(myXmlTextReader);
+        myXmlValidatingReader.Schemas.Add(myXmlSchemaCollection);
+        myXmlValidatingReader.ValidationType = ValidationType.Schema;
+    }
+
+    [Obsolete]
+    public bool Validate()
+    {
+        success = true;
+
+        try
+        {
+            // Set the validation event handler
+            myXmlValidatingReader.ValidationEventHandler += new ValidationEventHandler(this.ValidationEventHandle);
+
+            // Read XML data
+            while (myXmlValidatingReader.Read()) { }
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message, e);
+        }
+        finally
+        {
+            myXmlValidatingReader.Close();
+        }
+
+        return success;
+    }
+
+    public void ValidationEventHandle(object sender, ValidationEventArgs args)
+    {
+        success = false;
+        Console.WriteLine("\tValidation error: " + args.Message);
+
+        if (args.Severity == XmlSeverityType.Warning)
+        {
+            Console.WriteLine("No schema found to enforce validation.");
+        }
+        else
+            if (args.Severity == XmlSeverityType.Error)
+        {
+            Console.WriteLine("validation error occurred when validating the instance document.");
+        }
+
+        if (args.Exception != null) // XSD schema validation error
+        {
+            Console.WriteLine(args.Exception.SourceUri + "," + args.Exception.LinePosition + "," + args.Exception.LineNumber);
+        }
     }
 }

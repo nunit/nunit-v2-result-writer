@@ -12,6 +12,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Results.xsd" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="nunit.engine.api" Version="3.11.1" />
 
     <!-- This is the newest NUnit that support .NET Framework 2.0 -->
