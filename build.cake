@@ -1,5 +1,6 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
+#tool nuget:?package=NUnit.Extension.NUnitProjectLoader&version=3.6.0
 //#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0-beta1&prerelease
 
 ////////////////////////////////////////////////////////////////////
@@ -113,7 +114,7 @@ Task("PackageNuGet")
 
 		tester.InstallPackage();
 		tester.VerifyPackage();
-		tester.TestPackage();
+		tester.RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
 		tester.UninstallPackage();
@@ -131,7 +132,7 @@ Task("PackageChocolatey")
 
 		tester.InstallPackage();
 		tester.VerifyPackage();
-		tester.TestPackage();
+		tester.RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
 		tester.UninstallPackage();

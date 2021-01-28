@@ -27,11 +27,11 @@ static readonly Uri MAILING_LIST_URL = new Uri("https://groups.google.com/forum/
 // PACKAGE TESTER
 //////////////////////////////////////////////////////////////////////
 
+const string NUNIT3_RESULT_FILE = "NUnit3TestResult.xml";
+const string NUNIT2_RESULT_FILE = "NUnit2TestResult.xml";
+
 public abstract class PackageTester
 {
-	static readonly string NUNIT3_RESULT_FILE = "NUnit3TestResult.xml";
-	static readonly string NUNIT2_RESULT_FILE = "NUnit2TestResult.xml";
-
 	protected BuildParameters _parameters;
 	protected ICakeContext _context;
 
@@ -44,6 +44,38 @@ public abstract class PackageTester
 	public abstract string Package { get; }
 	public abstract string InstallDirectory { get; }
 	public abstract PackageCheck[] PackageChecks { get; }
+	public PackageTest[] PackageTests = new PackageTest[]
+	{
+		new PackageTest()
+		{
+			Description = "Run mock-assembly under 3.10.0 console",
+			Files = new [] {
+				$"bin/Release/net20/mock-assembly.dll" },
+			ConsoleVersion = "3.10.0"
+		},
+		new PackageTest()
+		{
+			Description = "Run mock-assembly under 3.11.1 console",
+			Files = new [] {
+				$"bin/Release/net20/mock-assembly.dll" },
+			ConsoleVersion = "3.11.1"
+		},
+		new PackageTest()
+		{
+			Description = "Run two copies of mock-assembly under 3.11.1 console",
+			Files = new [] {
+				$"bin/Release/net20/mock-assembly.dll",
+				$"bin/Release/net20/mock-assembly.dll" },
+			ConsoleVersion = "3.11.1"
+		},
+		new PackageTest()
+		{
+			Description = "Run NUnit project with files under 3.11.1 console",
+			Files = new [] {
+				$"TwoMockAssemblies.nunit" },
+			ConsoleVersion = "3.11.1"
+		},
+	};
 
 	public void InstallPackage()
 	{
@@ -58,15 +90,15 @@ public abstract class PackageTester
 		_context.Information("Verification was successful!");
 	}
 
-	public void TestPackage()
+	public void RunPackageTests()
     {
-		foreach (string consoleVersion in _parameters.SupportedConsoleVersions)
+		foreach (var packageTest in PackageTests)
 		{
-			Banner($"Testing {MOCK_ASSEMBLY} under NUnit3-Console {consoleVersion}");
-			RunMockAssemblyTests(consoleVersion);
+			Banner(packageTest.Description);
+			RunConsoleTests(packageTest.ConsoleVersion, packageTest.Files);
 
-			Banner($"Verifying {NUNIT2_RESULT_FILE}");
-			TestRunner.Run(typeof(ResultWriterTests));
+			Banner($"Verifying contents of {NUNIT2_RESULT_FILE}");
+			TestRunner.Run(typeof(ResultWriterTests), typeof(SchemaValidationTests));
 		}
 	}
 
@@ -75,7 +107,7 @@ public abstract class PackageTester
 		_context.DeleteDirectory(InstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 	}
 
-	private void RunMockAssemblyTests(string consoleVersion)
+	private void RunConsoleTests(string consoleVersion, string[] assemblies)
     {
 		string runner = _parameters.GetPathToConsoleRunner(consoleVersion);
 
@@ -93,9 +125,9 @@ public abstract class PackageTester
 		if (_context.FileExists(NUNIT3_RESULT_FILE))
 			_context.DeleteFile(NUNIT3_RESULT_FILE);
 
-		string consoleOptions = $"--result:{NUNIT3_RESULT_FILE} --result:{NUNIT2_RESULT_FILE};format=nunit2";
-		string mockAssembly = _parameters.Net20OutputDirectory + MOCK_ASSEMBLY;
-		_context.StartProcess(runner, $"{mockAssembly} {consoleOptions}");
+		var args = string.Join(" ", assemblies) + $" --result:{NUNIT3_RESULT_FILE} --result:{NUNIT2_RESULT_FILE};format=nunit2";
+
+		_context.StartProcess(runner, args);
 		// We don't check the error code because we know that
 		// mock-assembly returns -4 due to a bad fixture.
 
@@ -122,6 +154,12 @@ public abstract class PackageTester
 	}
 }
 
+public class PackageTest
+{
+	public string Description { get; set; }
+	public string[] Files { get; set; }
+	public string ConsoleVersion { get; set; }
+}
 
 public class NuGetPackageTester : PackageTester
 {
