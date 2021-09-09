@@ -18,12 +18,22 @@ var configuration = Argument("configuration", "Debug");
 
 Setup<BuildParameters>((context) =>
 {
-	var parameters = new BuildParameters(context);
+	var parameters = BuildParameters.Create(context);
 
 	Information("Building {0} version {1} of TestCentric GUI.", parameters.Configuration, parameters.PackageVersion);
 
 	return parameters;
 });
+
+//////////////////////////////////////////////////////////////////////
+// DUMP SETTINGS
+//////////////////////////////////////////////////////////////////////
+
+Task("DumpSettings")
+	.Does<BuildParameters>((parameters) =>
+	{
+		parameters.DumpSettings();
+	});
 
 //////////////////////////////////////////////////////////////////////
 // CLEAN
@@ -139,6 +149,43 @@ Task("PackageChocolatey")
 	});
 
 //////////////////////////////////////////////////////////////////////
+// PUBLISH
+//////////////////////////////////////////////////////////////////////
+
+static bool hadPublishingErrors = false;
+
+Task("PublishPackages")
+	.Description("Publish nuget and chocolatey packages according to the current settings")
+	.IsDependentOn("PublishToMyGet")
+	// .IsDependentOn("PublishToNuGet")
+	// .IsDependentOn("PublishToChocolatey")
+	.Does(() =>
+	{
+		if (hadPublishingErrors)
+			throw new Exception("One of the publishing steps failed.");
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToMyGet")
+	.Description("Publish packages to MyGet")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToMyGet)
+			Information("Nothing to publish to MyGet from this run.");
+		else
+			try
+			{
+				PushNuGetPackage(parameters.NuGetPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
@@ -146,7 +193,7 @@ Task("Package")
 	.IsDependentOn("PackageNuGet")
 	.IsDependentOn("PackageChocolatey");
 
-Task("All")
+Task("Full")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
 	.IsDependentOn("Package");
@@ -154,7 +201,8 @@ Task("All")
 Task("Appveyor")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
-	.IsDependentOn("Package");
+	.IsDependentOn("Package")
+	.IsDependentOn("PublishPackages");
 
 Task("Travis")
 	.IsDependentOn("Build")

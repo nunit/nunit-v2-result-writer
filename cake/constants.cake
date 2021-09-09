@@ -17,6 +17,8 @@ const string MOCK_ASSEMBLY = "mock-assembly.dll";
 // Packaging
 const string NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
 const string CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
+const string MYGET_PUSH_URL =  "https://www.myget.org/F/nunit/api/v2";
+const string MYGET_API_KEY = "MYGET_API_KEY";
 
 // Package sources for nuget restore
 static readonly string[] PACKAGE_SOURCES = new string[]
