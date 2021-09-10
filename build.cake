@@ -7,8 +7,17 @@
 // ARGUMENTS
 //////////////////////////////////////////////////////////////////////
 
+// NOTE: These two constants are set here because constants.cake
+// isn't loaded until after the arguments are parsed.
+//
+// NOTE: Since GitVersion is only used when running under
+// Windows, the default version should be updated to the 
+// next version after each release.
+const string DEFAULT_VERSION = "3.7.0";
+const string DEFAULT_CONFIGURATION = "Release";
+
 var target = Argument("target", "Default");
-var configuration = Argument("configuration", "Debug");
+var configuration = Argument("configuration", DEFAULT_CONFIGURATION);
 
 #load cake/parameters.cake
 
@@ -122,12 +131,20 @@ Task("PackageNuGet")
 
 		var tester = new NuGetPackageTester(parameters);
 
-		tester.InstallPackage();
-		tester.VerifyPackage();
+		//tester.InstallPackage();
+ 		CleanDirectory(parameters.NuGetInstallDirectory);
+ 		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
+		//tester.VerifyPackage();
+		Check.That(parameters.NuGetInstallDirectory,
+			HasFiles("CHANGES.txt", "LICENSE.txt"),
+			HasDirectory("tools/net20").WithFile("nunit-v2-result-writer.dll"),
+			HasDirectory("tools/netcoreapp2.1").WithFile("nunit-v2-result-writer.dll"));
+
 		tester.RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
-		tester.UninstallPackage();
+		//tester.UninstallPackage();
+ 		//DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
     });
 
 Task("PackageChocolatey")
@@ -140,12 +157,20 @@ Task("PackageChocolatey")
 
 		var tester = new ChocolateyPackageTester(parameters);
 
-		tester.InstallPackage();
-		tester.VerifyPackage();
+		//tester.InstallPackage();
+ 		CleanDirectory(parameters.ChocolateyInstallDirectory);
+ 		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
+		//tester.VerifyPackage();
+		Check.That(parameters.ChocolateyInstallDirectory,
+			HasDirectory("tools").WithFiles("CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt"),
+			HasDirectory("tools/net20").WithFile("nunit-v2-result-writer.dll"),
+			HasDirectory("tools/netcoreapp2.1").WithFile("nunit-v2-result-writer.dll"));
+
 		tester.RunPackageTests();
 
 		// In case of error, this will not be executed, leaving the directory available for examination
-		tester.UninstallPackage();
+		//tester.UninstallPackage();
+ 		DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -194,6 +219,7 @@ Task("Package")
 	.IsDependentOn("PackageChocolatey");
 
 Task("Full")
+	.IsDependentOn("Clean")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
 	.IsDependentOn("Package");

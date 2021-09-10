@@ -1,6 +1,10 @@
 ﻿#load "./constants.cake"
 #load "./packaging.cake"
+#load "./package-checks.cake"
+#load "./package-tests.cake"
 #load "./test-runner.cake"
+#load "./test-results.cake"
+#load "./test-reports.cake"
 #load "./tests.cake"
 
 using System;
@@ -13,7 +17,7 @@ public class BuildParameters
 	public static BuildParameters Create(ISetupContext context)
 	{
 		var parameters = new BuildParameters(context);
-		//parameters.Validate();
+		parameters.Validate();
 
 		return parameters;
 	}
@@ -29,10 +33,12 @@ public class BuildParameters
 		ProjectDirectory = _context.Environment.WorkingDirectory.FullPath + "/";
 
 		Configuration = _context.Argument("configuration", DEFAULT_CONFIGURATION);
-		var dbgSuffix = Configuration == "Debug" ? "-dbg" : "";
-		PackageVersion = DEFAULT_VERSION + dbgSuffix;
+		PackageVersion = DEFAULT_VERSION;
 
 		MyGetApiKey = _context.EnvironmentVariable(MYGET_API_KEY);
+		NuGetApiKey = _context.EnvironmentVariable(NUGET_API_KEY);
+		ChocolateyApiKey = _context.EnvironmentVariable(CHOCO_API_KEY);
+		GitHubAccessToken = _context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
 		if (_context.BuildSystem().IsRunningOnAppVeyor)
 		{
@@ -51,12 +57,12 @@ public class BuildParameters
 
 				if (branch == "main" && !isPullRequest)
 				{
-					PackageVersion = DEFAULT_VERSION + "-dev-" + buildNumber + dbgSuffix;
+					PackageVersion = DEFAULT_VERSION + "-dev-" + buildNumber;
 					ShouldPublishToMyGet = true;
 				}
 				else
 				{
-					var suffix = "-ci-" + buildNumber + dbgSuffix;
+					var suffix = "-ci-" + buildNumber;
 
 					if (isPullRequest)
 						suffix += "-pr-" + appVeyor.Environment.PullRequest.Number;
@@ -77,10 +83,10 @@ public class BuildParameters
 		}
 	}
 
-	public ICakeContext Context => _context;
-
 	public string Target { get; }
 	public IEnumerable<string> TasksToExecute { get; }
+
+	public ICakeContext Context => _context;
 
 	public string Configuration { get; }
 	public string PackageVersion { get; set; }
@@ -100,17 +106,58 @@ public class BuildParameters
 	public string NuGetInstallDirectory => ToolsDirectory + NUGET_ID + "/";
 	public string ChocolateyInstallDirectory => ToolsDirectory + CHOCO_ID + "/";
 
-	// Files
-	public string NuGetPackage => PackageDirectory + NUGET_ID + "." + PackageVersion + ".nupkg";
-	public string ChocolateyPackage => PackageDirectory + CHOCO_ID + "." + PackageVersion + ".nupkg";
+	public string NuGetPackageName => NUGET_ID + "." + PackageVersion + ".nupkg";
+	public string ChocolateyPackageName => CHOCO_ID + "." + PackageVersion + ".nupkg";
+
+	public string NuGetPackage => PackageDirectory + NuGetPackageName;
+	public string ChocolateyPackage => PackageDirectory + ChocolateyPackageName;
+
+	public string MyGetPushUrl => MYGET_PUSH_URL;
+	public string NuGetPushUrl => NUGET_PUSH_URL;
+	public string ChocolateyPushUrl => CHOCO_PUSH_URL;
+
+	public string MyGetApiKey { get; }
+	public string NuGetApiKey { get; }
+	public string ChocolateyApiKey { get; }
+	public string GitHubAccessToken { get; }
 
 	public bool ShouldPublishToMyGet { get; } = false;
-	public string MyGetPushUrl => MYGET_PUSH_URL;
-	public string MyGetApiKey { get; }
 
 	public string GetPathToConsoleRunner(string version)
 	{
 		return ToolsDirectory + "NUnit.ConsoleRunner." + version + "/tools/nunit3-console.exe";
+	}
+
+	private void Validate()
+	{
+		var validationErrors = new List<string>();
+
+		if (TasksToExecute.Contains("PublishPackages"))
+		{
+			if (ShouldPublishToMyGet && string.IsNullOrEmpty(MyGetApiKey))
+				validationErrors.Add("MyGet ApiKey was not set.");
+			// if (ShouldPublishToNuGet && string.IsNullOrEmpty(NuGetApiKey))
+			// 	validationErrors.Add("NuGet ApiKey was not set.");
+			// if (ShouldPublishToChocolatey && string.IsNullOrEmpty(ChocolateyApiKey))
+			// 	validationErrors.Add("Chocolatey ApiKey was not set.");
+		}
+
+		// if (TasksToExecute.Contains("CreateDraftRelease") && (IsReleaseBranch || IsProductionRelease))
+		// {
+		// 	if (string.IsNullOrEmpty(GitHubAccessToken))
+		// 		validationErrors.Add("GitHub Access Token was not set.");
+		// }
+
+		if (validationErrors.Count > 0)
+		{
+			DumpSettings();
+
+			var msg = new StringBuilder("Parameter validation failed! See settings above.\n\nErrors found:\n");
+			foreach (var error in validationErrors)
+				msg.AppendLine("  " + error);
+
+			throw new InvalidOperationException(msg.ToString());
+		}
 	}
 
 	public void DumpSettings()
