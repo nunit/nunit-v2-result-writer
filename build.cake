@@ -121,56 +121,80 @@ Task("Test")
 // PACKAGING
 //////////////////////////////////////////////////////////////////////
 
-Task("PackageNuGet")
-	.IsDependentOn("Build")
+Task("BuildNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		CreateDirectory(parameters.PackageDirectory);
-
 		BuildNuGetPackage(parameters);
+    });
 
-		var tester = new NuGetPackageTester(parameters);
+Task("InstallNuGetPackage")
+	//.IsDependentOn("RemoveChocolateyPackageIfPresent") // So both are not present
+	.Does<BuildParameters>((parameters) =>
+	{
+		// Ensure we aren't inadvertently using the chocolatey install
+ 		DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
-		//tester.InstallPackage();
- 		CleanDirectory(parameters.NuGetInstallDirectory);
- 		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
-		//tester.VerifyPackage();
+		CleanDirectory(parameters.NuGetInstallDirectory);
+		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
+
+		Information($"Unzipped {parameters.NuGetPackageName} to { parameters.NuGetInstallDirectory}");
+	});
+
+Task("VerifyNuGetPackage")
+	.IsDependentOn("InstallNuGetPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
 		Check.That(parameters.NuGetInstallDirectory,
 			HasFiles("CHANGES.txt", "LICENSE.txt"),
 			HasDirectory("tools/net20").WithFile("nunit-v2-result-writer.dll"),
 			HasDirectory("tools/netcoreapp2.1").WithFile("nunit-v2-result-writer.dll"));
+		Information("Verification was successful!");
+	});
 
-		tester.RunPackageTests();
+Task("TestNuGetPackage")
+	.IsDependentOn("InstallNuGetPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		new NuGetPackageTester(parameters).RunPackageTests();
+	});
 
-		// In case of error, this will not be executed, leaving the directory available for examination
-		//tester.UninstallPackage();
- 		//DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
-    });
-
-Task("PackageChocolatey")
-	.IsDependentOn("Build")
+Task("BuildChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		CreateDirectory(parameters.PackageDirectory);
+		BuildChocolateyPackage(parameters);
+	});
 
-		BUildChocolateyPackage(parameters);
+Task("InstallChocolateyPackage")
+	//.IsDependentOn("RemoveNuGetPackageIfPresent") // So both are not present
+	.Does<BuildParameters>((parameters) =>
+	{
+		// Ensure we aren't inadvertently using the nuget install
+ 		DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
-		var tester = new ChocolateyPackageTester(parameters);
+		CleanDirectory(parameters.ChocolateyInstallDirectory);
+		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
 
-		//tester.InstallPackage();
- 		CleanDirectory(parameters.ChocolateyInstallDirectory);
- 		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
-		//tester.VerifyPackage();
+		Information($"Unzipped {parameters.ChocolateyPackageName} to { parameters.ChocolateyInstallDirectory}");
+	});
+
+Task("VerifyChocolateyPackage")
+	.IsDependentOn("InstallChocolateyPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
 		Check.That(parameters.ChocolateyInstallDirectory,
 			HasDirectory("tools").WithFiles("CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt"),
 			HasDirectory("tools/net20").WithFile("nunit-v2-result-writer.dll"),
 			HasDirectory("tools/netcoreapp2.1").WithFile("nunit-v2-result-writer.dll"));
+		Information("Verification was successful!");
+	});
 
-		tester.RunPackageTests();
-
-		// In case of error, this will not be executed, leaving the directory available for examination
-		//tester.UninstallPackage();
- 		DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+Task("TestChocolateyPackage")
+	.IsDependentOn("InstallChocolateyPackage")
+	.Does<BuildParameters>((parameters) =>
+	{
+		new ChocolateyPackageTester(parameters).RunPackageTests();
 	});
 
 //////////////////////////////////////////////////////////////////////
@@ -215,8 +239,19 @@ Task("PublishToMyGet")
 //////////////////////////////////////////////////////////////////////
 
 Task("Package")
+	.IsDependentOn("Build")
 	.IsDependentOn("PackageNuGet")
 	.IsDependentOn("PackageChocolatey");
+
+Task("PackageNuGet")
+	.IsDependentOn("BuildNuGetPackage")
+	.IsDependentOn("VerifyNuGetPackage")
+	.IsDependentOn("TestNuGetPackage");
+
+Task("PackageChocolatey")
+	.IsDependentOn("BuildChocolateyPackage")
+	.IsDependentOn("VerifyChocolateyPackage")
+	.IsDependentOn("TestChocolateyPackage");
 
 Task("Full")
 	.IsDependentOn("Clean")

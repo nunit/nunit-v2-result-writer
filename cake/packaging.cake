@@ -41,15 +41,15 @@ public void BuildNuGetPackage(BuildParameters parameters)
 			Summary = SUMMARY,
 			ProjectUrl = PROJECT_URL,
 			IconUrl = ICON_URL,
-				//Icon = "nunit.ico", // Waiting for Cake release
-				License = new NuSpecLicense() { Type = "expression", Value = "MIT" },
-				//LicenseUrl = LICENSE_URL,
-				RequireLicenseAcceptance = false,
+			//Icon = "nunit.ico", // Waiting for Cake release
+			License = new NuSpecLicense() { Type = "expression", Value = "MIT" },
+			//LicenseUrl = LICENSE_URL,
+			RequireLicenseAcceptance = false,
 			Copyright = COPYRIGHT,
 			ReleaseNotes = RELEASE_NOTES,
 			Tags = TAGS,
-				//Language = "en-US",
-				OutputDirectory = parameters.PackageDirectory,
+			//Language = "en-US",
+			OutputDirectory = parameters.PackageDirectory,
 			KeepTemporaryNuSpecFile = false,
 			Files = new[] {
 					new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" },
@@ -65,7 +65,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 // BUILD CHOCOLATEY PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-public void BUildChocolateyPackage(BuildParameters parameters)
+public void BuildChocolateyPackage(BuildParameters parameters)
 {
 	ChocolateyPack(
 		new ChocolateyPackSettings()
@@ -89,8 +89,8 @@ public void BUildChocolateyPackage(BuildParameters parameters)
 			MailingListUrl = MAILING_LIST_URL,
 			ReleaseNotes = RELEASE_NOTES,
 			Tags = TAGS,
-				//Language = "en-US",
-				OutputDirectory = parameters.PackageDirectory,
+			//Language = "en-US",
+			OutputDirectory = parameters.PackageDirectory,
 			Files = new[] {
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" },

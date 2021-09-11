@@ -65,22 +65,6 @@ public abstract class PackageTester
 				}
 			}
 		});
-		// PackageTests.Add(new PackageTest()
-		// {
-		// 	Description = "Project with one assembly, some failures",
-		// 	Arguments = "FailingAssembly.nunit",
-		// 	TestConsoleVersions = new string[] { "3.12.0", "3.11.1", "3.10.0" },
-		// 	ExpectedResult = new ExpectedResult("Failed")
-		// 	{
-		// 		Total = 9,
-		// 		Passed = 4,
-		// 		Failed = 2,
-		// 		Warnings = 0,
-		// 		Inconclusive = 1,
-		// 		Skipped = 2,
-		// 		Assemblies = new[] { new ExpectedAssemblyResult("test-lib-2.dll", "net-2.0") }
-		// 	}
-		// });
 	}
 
 	protected abstract string PackageName { get; }
