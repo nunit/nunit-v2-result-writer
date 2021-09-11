@@ -1,6 +1,11 @@
 ﻿#load "./constants.cake"
+#load "./versioning.cake"
 #load "./packaging.cake"
+#load "./package-checks.cake"
+#load "./package-tests.cake"
 #load "./test-runner.cake"
+#load "./test-results.cake"
+#load "./test-reports.cake"
 #load "./tests.cake"
 
 using System;
@@ -13,7 +18,7 @@ public class BuildParameters
 	public static BuildParameters Create(ISetupContext context)
 	{
 		var parameters = new BuildParameters(context);
-		//parameters.Validate();
+		parameters.Validate();
 
 		return parameters;
 	}
@@ -29,61 +34,27 @@ public class BuildParameters
 		ProjectDirectory = _context.Environment.WorkingDirectory.FullPath + "/";
 
 		Configuration = _context.Argument("configuration", DEFAULT_CONFIGURATION);
-		var dbgSuffix = Configuration == "Debug" ? "-dbg" : "";
-		PackageVersion = DEFAULT_VERSION + dbgSuffix;
 
 		MyGetApiKey = _context.EnvironmentVariable(MYGET_API_KEY);
+		NuGetApiKey = _context.EnvironmentVariable(NUGET_API_KEY);
+		ChocolateyApiKey = _context.EnvironmentVariable(CHOCO_API_KEY);
+		GitHubAccessToken = _context.EnvironmentVariable(GITHUB_ACCESS_TOKEN);
 
-		if (_context.BuildSystem().IsRunningOnAppVeyor)
-		{
-			var appVeyor = _context.AppVeyor();
-			var tag = appVeyor.Environment.Repository.Tag;
-
-			if (tag.IsTag)
-			{
-				PackageVersion = tag.Name;
-			}
-			else
-			{
-				var buildNumber = appVeyor.Environment.Build.Number.ToString("00000");
-				var branch = appVeyor.Environment.Repository.Branch;
-				var isPullRequest = appVeyor.Environment.PullRequest.IsPullRequest;
-
-				if (branch == "main" && !isPullRequest)
-				{
-					PackageVersion = DEFAULT_VERSION + "-dev-" + buildNumber + dbgSuffix;
-					ShouldPublishToMyGet = true;
-				}
-				else
-				{
-					var suffix = "-ci-" + buildNumber + dbgSuffix;
-
-					if (isPullRequest)
-						suffix += "-pr-" + appVeyor.Environment.PullRequest.Number;
-					else
-						suffix += "-" + branch;
-
-					// Nuget limits "special version part" to 20 chars. Add one for the hyphen.
-					if (suffix.Length > 21)
-						suffix = suffix.Substring(0, 21);
-
-					suffix = suffix.Replace(".", "");
-
-					PackageVersion = DEFAULT_VERSION + suffix;
-				}
-
-				appVeyor.UpdateBuildVersion(PackageVersion + "-" + appVeyor.Environment.Build.Number);
-			}
-		}
+		BuildVersion = new BuildVersion(context, this);
 	}
-
-	public ICakeContext Context => _context;
 
 	public string Target { get; }
 	public IEnumerable<string> TasksToExecute { get; }
 
+	public ICakeContext Context => _context;
+
 	public string Configuration { get; }
-	public string PackageVersion { get; set; }
+
+	public BuildVersion BuildVersion { get; }
+	public string PackageVersion => BuildVersion.PackageVersion;
+	public string AssemblyVersion => BuildVersion.AssemblyVersion;
+	public string AssemblyFileVersion => BuildVersion.AssemblyFileVersion;
+	public string AssemblyInformationalVersion => BuildVersion.AssemblyInformationalVersion;
 
 	public bool IsLocalBuild => _buildSystem.IsLocalBuild;
 	public bool IsRunningOnUnix => _context.IsRunningOnUnix();
@@ -100,17 +71,69 @@ public class BuildParameters
 	public string NuGetInstallDirectory => ToolsDirectory + NUGET_ID + "/";
 	public string ChocolateyInstallDirectory => ToolsDirectory + CHOCO_ID + "/";
 
-	// Files
-	public string NuGetPackage => PackageDirectory + NUGET_ID + "." + PackageVersion + ".nupkg";
-	public string ChocolateyPackage => PackageDirectory + CHOCO_ID + "." + PackageVersion + ".nupkg";
+	public string NuGetPackageName => NUGET_ID + "." + PackageVersion + ".nupkg";
+	public string ChocolateyPackageName => CHOCO_ID + "." + PackageVersion + ".nupkg";
 
-	public bool ShouldPublishToMyGet { get; } = false;
+	public string NuGetPackage => PackageDirectory + NuGetPackageName;
+	public string ChocolateyPackage => PackageDirectory + ChocolateyPackageName;
+
 	public string MyGetPushUrl => MYGET_PUSH_URL;
+	public string NuGetPushUrl => NUGET_PUSH_URL;
+	public string ChocolateyPushUrl => CHOCO_PUSH_URL;
+
 	public string MyGetApiKey { get; }
+	public string NuGetApiKey { get; }
+	public string ChocolateyApiKey { get; }
+	public string GitHubAccessToken { get; }
+
+	public string BranchName => BuildVersion.BranchName;
+	public bool IsReleaseBranch => BuildVersion.IsReleaseBranch;
+
+	public bool IsPreRelease => BuildVersion.IsPreRelease;
+	public bool ShouldPublishToMyGet =>
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_MYGET.Contains(BuildVersion.PreReleaseLabel);
+	public bool ShouldPublishToNuGet =>
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_NUGET.Contains(BuildVersion.PreReleaseLabel);
+	public bool ShouldPublishToChocolatey =>
+		!IsPreRelease || LABELS_WE_PUBLISH_ON_CHOCOLATEY.Contains(BuildVersion.PreReleaseLabel);
+	public bool IsProductionRelease =>
+		!IsPreRelease || LABELS_WE_RELEASE_ON_GITHUB.Contains(BuildVersion.PreReleaseLabel);
 
 	public string GetPathToConsoleRunner(string version)
 	{
 		return ToolsDirectory + "NUnit.ConsoleRunner." + version + "/tools/nunit3-console.exe";
+	}
+
+	private void Validate()
+	{
+		var validationErrors = new List<string>();
+
+		if (TasksToExecute.Contains("PublishPackages"))
+		{
+			if (ShouldPublishToMyGet && string.IsNullOrEmpty(MyGetApiKey))
+				validationErrors.Add("MyGet ApiKey was not set.");
+			if (ShouldPublishToNuGet && string.IsNullOrEmpty(NuGetApiKey))
+				validationErrors.Add("NuGet ApiKey was not set.");
+			if (ShouldPublishToChocolatey && string.IsNullOrEmpty(ChocolateyApiKey))
+				validationErrors.Add("Chocolatey ApiKey was not set.");
+		}
+
+		if (TasksToExecute.Contains("CreateDraftRelease") && (IsReleaseBranch || IsProductionRelease))
+		{
+			if (string.IsNullOrEmpty(GitHubAccessToken))
+				validationErrors.Add("GitHub Access Token was not set.");
+		}
+
+		if (validationErrors.Count > 0)
+		{
+			DumpSettings();
+
+			var msg = new StringBuilder("Parameter validation failed! See settings above.\n\nErrors found:\n");
+			foreach (var error in validationErrors)
+				msg.AppendLine("  " + error);
+
+			throw new InvalidOperationException(msg.ToString());
+		}
 	}
 
 	public void DumpSettings()
@@ -127,13 +150,13 @@ public class BuildParameters
 
 		Console.WriteLine("\nVERSIONING");
 		Console.WriteLine("PackageVersion:               " + PackageVersion);
-		// Console.WriteLine("AssemblyVersion:              " + AssemblyVersion);
-		// Console.WriteLine("AssemblyFileVersion:          " + AssemblyFileVersion);
-		// Console.WriteLine("AssemblyInformationalVersion: " + AssemblyInformationalVersion);
-		// Console.WriteLine("SemVer:                       " + BuildVersion.SemVer);
-		// Console.WriteLine("IsPreRelease:                 " + BuildVersion.IsPreRelease);
-		// Console.WriteLine("PreReleaseLabel:              " + BuildVersion.PreReleaseLabel);
-		// Console.WriteLine("PreReleaseSuffix:             " + BuildVersion.PreReleaseSuffix);
+		Console.WriteLine("AssemblyVersion:              " + AssemblyVersion);
+		Console.WriteLine("AssemblyFileVersion:          " + AssemblyFileVersion);
+		Console.WriteLine("AssemblyInformationalVersion: " + AssemblyInformationalVersion);
+		Console.WriteLine("SemVer:                       " + BuildVersion.SemVer);
+		Console.WriteLine("IsPreRelease:                 " + BuildVersion.IsPreRelease);
+		Console.WriteLine("PreReleaseLabel:              " + BuildVersion.PreReleaseLabel);
+		Console.WriteLine("PreReleaseSuffix:             " + BuildVersion.PreReleaseSuffix);
 
 		Console.WriteLine("\nDIRECTORIES");
 		Console.WriteLine("Project:   " + ProjectDirectory);
@@ -156,20 +179,20 @@ public class BuildParameters
 
 		Console.WriteLine("\nPACKAGING");
 		Console.WriteLine("MyGetPushUrl:              " + MyGetPushUrl);
-		//Console.WriteLine("NuGetPushUrl:              " + NuGetPushUrl);
-		//Console.WriteLine("ChocolateyPushUrl:         " + ChocolateyPushUrl);
+		Console.WriteLine("NuGetPushUrl:              " + NuGetPushUrl);
+		Console.WriteLine("ChocolateyPushUrl:         " + ChocolateyPushUrl);
 		Console.WriteLine("MyGetApiKey:               " + (!string.IsNullOrEmpty(MyGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
-		//Console.WriteLine("NuGetApiKey:               " + (!string.IsNullOrEmpty(NuGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
-		//Console.WriteLine("ChocolateyApiKey:          " + (!string.IsNullOrEmpty(ChocolateyApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
+		Console.WriteLine("NuGetApiKey:               " + (!string.IsNullOrEmpty(NuGetApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
+		Console.WriteLine("ChocolateyApiKey:          " + (!string.IsNullOrEmpty(ChocolateyApiKey) ? "AVAILABLE" : "NOT AVAILABLE"));
 
 		Console.WriteLine("\nPUBLISHING");
 		Console.WriteLine("ShouldPublishToMyGet:      " + ShouldPublishToMyGet);
-		// Console.WriteLine("ShouldPublishToNuGet:      " + ShouldPublishToNuGet);
-		// Console.WriteLine("ShouldPublishToChocolatey: " + ShouldPublishToChocolatey);
+		 Console.WriteLine("ShouldPublishToNuGet:      " + ShouldPublishToNuGet);
+		 Console.WriteLine("ShouldPublishToChocolatey: " + ShouldPublishToChocolatey);
 
-		//Console.WriteLine("\nRELEASING");
-		//Console.WriteLine("BranchName:                   " + BranchName);
-		//Console.WriteLine("IsReleaseBranch:              " + IsReleaseBranch);
-		//Console.WriteLine("IsProductionRelease:          " + IsProductionRelease);
+		Console.WriteLine("\nRELEASING");
+		Console.WriteLine("BranchName:                   " + BranchName);
+		Console.WriteLine("IsReleaseBranch:              " + IsReleaseBranch);
+		Console.WriteLine("IsProductionRelease:          " + IsProductionRelease);
 	}
 }
