@@ -133,8 +133,10 @@ Task("InstallNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		// Ensure we aren't inadvertently using the chocolatey install
- 		DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
+ 			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
+		CreateDirectory(parameters.NuGetInstallDirectory);
 		CleanDirectory(parameters.NuGetInstallDirectory);
 		Unzip(parameters.NuGetPackage, parameters.NuGetInstallDirectory);
 
@@ -171,8 +173,10 @@ Task("InstallChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		// Ensure we aren't inadvertently using the nuget install
- 		DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+		if (DirectoryExists(parameters.NuGetInstallDirectory))
+ 			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
+		CreateDirectory(parameters.ChocolateyInstallDirectory);
 		CleanDirectory(parameters.ChocolateyInstallDirectory);
 		Unzip(parameters.ChocolateyPackage, parameters.ChocolateyInstallDirectory);
 
