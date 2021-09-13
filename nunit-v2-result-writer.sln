@@ -28,10 +28,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C60D66FA-F
 		cake\assertions.cake = cake\assertions.cake
 		cake\constants.cake = cake\constants.cake
 		cake\constraints.cake = cake\constraints.cake
+		cake\package-checks.cake = cake\package-checks.cake
+		cake\package-tests.cake = cake\package-tests.cake
 		cake\packaging.cake = cake\packaging.cake
 		cake\parameters.cake = cake\parameters.cake
+		cake\test-reports.cake = cake\test-reports.cake
+		cake\test-results.cake = cake\test-results.cake
 		cake\test-runner.cake = cake\test-runner.cake
 		cake\tests.cake = cake\tests.cake
+		cake\versioning.cake = cake\versioning.cake
 	EndProjectSection
 EndProject
 Global

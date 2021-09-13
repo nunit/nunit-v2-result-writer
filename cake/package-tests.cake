@@ -80,8 +80,6 @@ public abstract class PackageTester
 
 		foreach (var packageTest in PackageTests)
 		{
-			var resultFile = _parameters.OutputDirectory + DEFAULT_TEST_RESULT_FILE;
-
 			foreach (var consoleVersion in packageTest.TestConsoleVersions)
 			{
 				// Delete result files ahead of time so we don't mistakenly
@@ -156,12 +154,6 @@ public abstract class PackageTester
 		}
 
 		_context.StartProcess(runner, arguments);
-		// We don't check the error code because we know that
-		// mock-assembly returns -4 due to a bad fixture.
-
-		// Should have created the result file
-		if (!_context.FileExists(DEFAULT_TEST_RESULT_FILE))
-			throw new System.Exception("The result file was not created.");
 	}
 
 	private void DisplayBanner(string message)

@@ -130,12 +130,11 @@ Task("BuildNuGetPackage")
     });
 
 Task("InstallNuGetPackage")
-	//.IsDependentOn("RemoveChocolateyPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
 		// Ensure we aren't inadvertently using the chocolatey install
 		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
- 			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
 		CreateDirectory(parameters.NuGetInstallDirectory);
 		CleanDirectory(parameters.NuGetInstallDirectory);
@@ -170,12 +169,11 @@ Task("BuildChocolateyPackage")
 	});
 
 Task("InstallChocolateyPackage")
-	//.IsDependentOn("RemoveNuGetPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
 		// Ensure we aren't inadvertently using the nuget install
 		if (DirectoryExists(parameters.NuGetInstallDirectory))
- 			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
 		CreateDirectory(parameters.ChocolateyInstallDirectory);
 		CleanDirectory(parameters.ChocolateyInstallDirectory);
@@ -211,8 +209,8 @@ static bool hadPublishingErrors = false;
 Task("PublishPackages")
 	.Description("Publish nuget and chocolatey packages according to the current settings")
 	.IsDependentOn("PublishToMyGet")
-	// .IsDependentOn("PublishToNuGet")
-	// .IsDependentOn("PublishToChocolatey")
+	.IsDependentOn("PublishToNuGet")
+	.IsDependentOn("PublishToChocolatey")
 	.Does(() =>
 	{
 		if (hadPublishingErrors)
@@ -232,6 +230,44 @@ Task("PublishToMyGet")
 			{
 				PushNuGetPackage(parameters.NuGetPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
 				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToNuGet")
+	.Description("Publish packages to NuGet")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToNuGet)
+			Information("Nothing to publish to NuGet from this run.");
+		else
+			try
+			{
+				PushNuGetPackage(parameters.NuGetPackage, parameters.NuGetApiKey, parameters.NuGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToChocolatey")
+	.Description("Publish packages to Chocolatey")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToChocolatey)
+			Information("Nothing to publish to Chocolatey from this run.");
+		else
+			try
+			{
+				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.ChocolateyApiKey, parameters.ChocolateyPushUrl);
 			}
 			catch (Exception)
 			{
