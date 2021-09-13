@@ -30,7 +30,10 @@ Setup<BuildParameters>((context) =>
 {
 	var parameters = BuildParameters.Create(context);
 
-	Information("Building {0} version {1} of TestCentric GUI.", parameters.Configuration, parameters.PackageVersion);
+	if (BuildSystem.IsRunningOnAppVeyor)
+		AppVeyor.UpdateBuildVersion(parameters.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
+
+	Information("Building {0} version {1} of V2 Result Writer Extension.", parameters.Configuration, parameters.PackageVersion);
 
 	return parameters;
 });
