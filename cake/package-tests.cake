@@ -28,43 +28,6 @@ public abstract class PackageTester
     {
 		_parameters = parameters;
 		_context = parameters.Context;
-
-		PackageTests.Add(new PackageTest()
-		{
-			Description = "Run mock-assembly",
-			Arguments = $"bin/Release/net20/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
-			TestConsoleVersions = new [] { "3.10.0", "3.11.1" },
-			ExpectedResult = new ExpectedResult("Failed")
-			{
-		 		Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0") }
-			}
-		});
-		PackageTests.Add(new PackageTest()
-		{
-			Description = "Run two copies of mock-assembly",
-			Arguments = $"bin/Release/net20/mock-assembly.dll bin/Release/net20/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
-			TestConsoleVersions = new [] { "3.11.1" },
-			ExpectedResult = new ExpectedResult("Failed")
-			{
-		 		Assemblies = new[] {
-					 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0"),
-					 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0")
-				}
-			}
-		});
-		PackageTests.Add(new PackageTest()
-		{
-			Description = "Run NUnit project with two assemblies",
-			Arguments = $"TwoMockAssemblies.nunit --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
-			TestConsoleVersions = new [] { "3.11.1" },
-			ExpectedResult = new ExpectedResult("Failed")
-			{
-		 		Assemblies = new[] {
-					 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0"),
-					 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0")
-				}
-			}
-		});
 	}
 
 	protected abstract string PackageName { get; }
@@ -72,13 +35,16 @@ public abstract class PackageTester
 	public abstract string InstallDirectory { get; }
 
 	public PackageCheck[] PackageChecks { get; set; }
-	public List<PackageTest> PackageTests = new List<PackageTest>();
 
-	public void RunPackageTests()
+	// TODO: Package testing for this extension has been modified
+	// to deal with two different result files. This logic is
+	// specific to the extension itself and should be extracted.
+
+	public void RunPackageTests(IList<PackageTest> packageTests)
     {
 		var reporter = new ResultReporter(PackageName);
 
-		foreach (var packageTest in PackageTests)
+		foreach (var packageTest in packageTests)
 		{
 			foreach (var consoleVersion in packageTest.TestConsoleVersions)
 			{

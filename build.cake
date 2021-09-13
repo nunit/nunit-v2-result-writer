@@ -170,7 +170,7 @@ Task("TestNuGetPackage")
 	.IsDependentOn("InstallNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		new NuGetPackageTester(parameters).RunPackageTests();
+		new NuGetPackageTester(parameters).RunPackageTests(PackageTests);
 	});
 
 Task("BuildChocolateyPackage")
@@ -209,8 +209,48 @@ Task("TestChocolateyPackage")
 	.IsDependentOn("InstallChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		new ChocolateyPackageTester(parameters).RunPackageTests();
+		new ChocolateyPackageTester(parameters).RunPackageTests(PackageTests);
 	});
+
+PackageTest[] PackageTests = new PackageTest[]
+{
+	new PackageTest()
+	{
+		Description = "Run mock-assembly",
+		Arguments = $"bin/Release/net20/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		TestConsoleVersions = new [] { "3.10.0", "3.11.1" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+		 	Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0") }
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Run two copies of mock-assembly",
+		Arguments = $"bin/Release/net20/mock-assembly.dll bin/Release/net20/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		TestConsoleVersions = new[] { "3.11.1" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Assemblies = new[] {
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0"),
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0")
+					}
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Run NUnit project with two assemblies",
+		Arguments = $"TwoMockAssemblies.nunit --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		TestConsoleVersions = new[] { "3.11.1" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Assemblies = new[] {
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0"),
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0")
+					}
+		}
+	}
+};
 
 //////////////////////////////////////////////////////////////////////
 // PUBLISH
