@@ -5,22 +5,27 @@
 //#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0-beta1&prerelease
 
 ////////////////////////////////////////////////////////////////////
-// ARGUMENTS
+// CONSTANTS
 //////////////////////////////////////////////////////////////////////
 
-// NOTE: These two constants are set here because constants.cake
-// isn't loaded until after the arguments are parsed.
-//
-// NOTE: Since GitVersion is only used when running under
-// Windows, the default version should be updated to the 
-// next version after each release.
+const string SOLUTION_FILE = "nunit-v2-result-writer.sln";
+const string NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
+const string CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
 const string DEFAULT_VERSION = "3.7.0";
 const string DEFAULT_CONFIGURATION = "Release";
 
-var target = Argument("target", "Default");
-var configuration = Argument("configuration", DEFAULT_CONFIGURATION);
-
+// Load scripts after defining constants
 #load cake/parameters.cake
+
+////////////////////////////////////////////////////////////////////
+// ARGUMENTS
+//////////////////////////////////////////////////////////////////////
+
+var target = Argument("target", "Default");
+
+// Additional arguments defined in the cake scripts:
+//   --configuration
+//   --version
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN
@@ -54,9 +59,9 @@ Task("DumpSettings")
 
 Task("Clean")
     .Does<BuildParameters>((parameters) =>
-{
-    CleanDirectory(parameters.OutputDirectory);
-});
+	{
+		CleanDirectory(parameters.OutputDirectory);
+	});
 
 
 //////////////////////////////////////////////////////////////////////
@@ -65,12 +70,16 @@ Task("Clean")
 
 Task("NuGetRestore")
     .Does(() =>
-{
-    NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
 	{
-		Source = PACKAGE_SOURCES
+		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
+		{
+			Source = new string[]
+			{
+				"https://www.nuget.org/api/v2",
+				"https://www.myget.org/F/nunit/api/v2"
+			}
+		});
 	});
-});
 
 //////////////////////////////////////////////////////////////////////
 // BUILD
@@ -110,7 +119,7 @@ Task("Test")
 	{
 		// This version is used for the unit tests
 		var runner = parameters.GetPathToConsoleRunner("3.11.1");
-		string unitTests = parameters.Net20OutputDirectory + UNIT_TEST_ASSEMBLY;
+		string unitTests = parameters.OutputDirectory + "net20/nunit-v2-result-writer.tests.dll";
 
 		int rc = StartProcess(runner, unitTests);
 		if (rc == 1)

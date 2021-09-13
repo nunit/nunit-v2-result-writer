@@ -55,8 +55,8 @@ public void BuildNuGetPackage(BuildParameters parameters)
 					new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" },
 					new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" },
 					new NuSpecContent { Source = parameters.ProjectDirectory + "net20.engine.addins", Target = "tools" },
-					new NuSpecContent { Source = parameters.Net20OutputDirectory + OUTPUT_ASSEMBLY, Target = "tools/net20" },
-					new NuSpecContent { Source = parameters.NetCore21OutputDirectory + OUTPUT_ASSEMBLY, Target = "tools/netcoreapp2.1" }
+					new NuSpecContent { Source = parameters.Net20OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/net20" },
+					new NuSpecContent { Source = parameters.NetCore21OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
 			}
 		});
 }
@@ -96,8 +96,8 @@ public void BuildChocolateyPackage(BuildParameters parameters)
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "net20.engine.addins", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = parameters.Net20OutputDirectory + OUTPUT_ASSEMBLY, Target = "tools/net20" },
-					new ChocolateyNuSpecContent { Source = parameters.NetCore21OutputDirectory + OUTPUT_ASSEMBLY, Target = "tools/netcoreapp2.1" }
+					new ChocolateyNuSpecContent { Source = parameters.Net20OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/net20" },
+					new ChocolateyNuSpecContent { Source = parameters.NetCore21OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
 			}
 		});
 }
