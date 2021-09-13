@@ -6,6 +6,7 @@
 #load "./test-results.cake"
 #load "./test-reports.cake"
 #load "./tests.cake"
+#load "./utilities.cake"
 
 using System;
 
@@ -80,8 +81,7 @@ public class BuildParameters
 	// Directories
 	public string ProjectDirectory { get; }
 	public string OutputDirectory => ProjectDirectory + "bin/" + Configuration + "/";
-	public string Net20OutputDirectory => OutputDirectory + "net20/";
-	public string NetCore21OutputDirectory => OutputDirectory + "netcoreapp2.1/";
+	public string SourceDirectory => ProjectDirectory + "src/";
 	public string PackageDirectory => ProjectDirectory + "output/";
 	public string ToolsDirectory => ProjectDirectory + "tools/";
 	public string NuGetInstallDirectory => ToolsDirectory + NUGET_ID + "/";

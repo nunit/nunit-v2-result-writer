@@ -60,9 +60,19 @@ Task("DumpSettings")
 Task("Clean")
     .Does<BuildParameters>((parameters) =>
 	{
+		Information("Cleaning " + parameters.OutputDirectory);
 		CleanDirectory(parameters.OutputDirectory);
 	});
 
+Task("CleanAll")
+	.Does<BuildParameters>((parameters) =>
+	{
+		Information("Cleaning all output directories");
+		CleanDirectory(parameters.ProjectDirectory + "bin/");
+
+		Information("Deleting object directories");
+		DeleteObjectDirectories(parameters);
+	});
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD

@@ -55,8 +55,8 @@ public void BuildNuGetPackage(BuildParameters parameters)
 					new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" },
 					new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" },
 					new NuSpecContent { Source = parameters.ProjectDirectory + "net20.engine.addins", Target = "tools" },
-					new NuSpecContent { Source = parameters.Net20OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/net20" },
-					new NuSpecContent { Source = parameters.NetCore21OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
+					new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-v2-result-writer.dll", Target = "tools/net20" },
+					new NuSpecContent { Source = parameters.OutputDirectory + "netcoreapp2.1/nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
 			}
 		});
 }
@@ -96,27 +96,8 @@ public void BuildChocolateyPackage(BuildParameters parameters)
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "net20.engine.addins", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = parameters.Net20OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/net20" },
-					new ChocolateyNuSpecContent { Source = parameters.NetCore21OutputDirectory + "nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
+					new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-v2-result-writer.dll", Target = "tools/net20" },
+					new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "netcoreapp2.1/nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
 			}
 		});
-}
-
-private void PushNuGetPackage(FilePath package, string apiKey, string url)
-{
-	CheckPackageExists(package);
-	NuGetPush(package, new NuGetPushSettings() { ApiKey = apiKey, Source = url });
-}
-
-private void PushChocolateyPackage(FilePath package, string apiKey, string url)
-{
-	CheckPackageExists(package);
-	ChocolateyPush(package, new ChocolateyPushSettings() { ApiKey = apiKey, Source = url });
-}
-
-private void CheckPackageExists(FilePath package)
-{
-	if (!FileExists(package))
-		throw new InvalidOperationException(
-			$"Package not found: {package.GetFilename()}.\nCode may have changed since package was last built.");
 }
