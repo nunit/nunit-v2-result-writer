@@ -5,22 +5,27 @@
 //#tool nuget:?package=NUnit.ConsoleRunner&version=3.12.0-beta1&prerelease
 
 ////////////////////////////////////////////////////////////////////
-// ARGUMENTS
+// CONSTANTS
 //////////////////////////////////////////////////////////////////////
 
-// NOTE: These two constants are set here because constants.cake
-// isn't loaded until after the arguments are parsed.
-//
-// NOTE: Since GitVersion is only used when running under
-// Windows, the default version should be updated to the 
-// next version after each release.
+const string SOLUTION_FILE = "nunit-v2-result-writer.sln";
+const string NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
+const string CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
 const string DEFAULT_VERSION = "3.7.0";
 const string DEFAULT_CONFIGURATION = "Release";
 
-var target = Argument("target", "Default");
-var configuration = Argument("configuration", DEFAULT_CONFIGURATION);
-
+// Load scripts after defining constants
 #load cake/parameters.cake
+
+////////////////////////////////////////////////////////////////////
+// ARGUMENTS
+//////////////////////////////////////////////////////////////////////
+
+var target = Argument("target", "Default");
+
+// Additional arguments defined in the cake scripts:
+//   --configuration
+//   --version
 
 //////////////////////////////////////////////////////////////////////
 // SETUP AND TEARDOWN
@@ -30,7 +35,10 @@ Setup<BuildParameters>((context) =>
 {
 	var parameters = BuildParameters.Create(context);
 
-	Information("Building {0} version {1} of TestCentric GUI.", parameters.Configuration, parameters.PackageVersion);
+	if (BuildSystem.IsRunningOnAppVeyor)
+		AppVeyor.UpdateBuildVersion(parameters.PackageVersion + "-" + AppVeyor.Environment.Build.Number);
+
+	Information("Building {0} version {1} of V2 Result Writer Extension.", parameters.Configuration, parameters.PackageVersion);
 
 	return parameters;
 });
@@ -51,10 +59,20 @@ Task("DumpSettings")
 
 Task("Clean")
     .Does<BuildParameters>((parameters) =>
-{
-    CleanDirectory(parameters.OutputDirectory);
-});
+	{
+		Information("Cleaning " + parameters.OutputDirectory);
+		CleanDirectory(parameters.OutputDirectory);
+	});
 
+Task("CleanAll")
+	.Does<BuildParameters>((parameters) =>
+	{
+		Information("Cleaning all output directories");
+		CleanDirectory(parameters.ProjectDirectory + "bin/");
+
+		Information("Deleting object directories");
+		DeleteObjectDirectories(parameters);
+	});
 
 //////////////////////////////////////////////////////////////////////
 // INITIALIZE FOR BUILD
@@ -62,12 +80,16 @@ Task("Clean")
 
 Task("NuGetRestore")
     .Does(() =>
-{
-    NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
 	{
-		Source = PACKAGE_SOURCES
+		NuGetRestore(SOLUTION_FILE, new NuGetRestoreSettings()
+		{
+			Source = new string[]
+			{
+				"https://www.nuget.org/api/v2",
+				"https://www.myget.org/F/nunit/api/v2"
+			}
+		});
 	});
-});
 
 //////////////////////////////////////////////////////////////////////
 // BUILD
@@ -107,7 +129,7 @@ Task("Test")
 	{
 		// This version is used for the unit tests
 		var runner = parameters.GetPathToConsoleRunner("3.11.1");
-		string unitTests = parameters.Net20OutputDirectory + UNIT_TEST_ASSEMBLY;
+		string unitTests = parameters.OutputDirectory + "net20/nunit-v2-result-writer.tests.dll";
 
 		int rc = StartProcess(runner, unitTests);
 		if (rc == 1)
@@ -130,12 +152,11 @@ Task("BuildNuGetPackage")
     });
 
 Task("InstallNuGetPackage")
-	//.IsDependentOn("RemoveChocolateyPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
 		// Ensure we aren't inadvertently using the chocolatey install
 		if (DirectoryExists(parameters.ChocolateyInstallDirectory))
- 			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+			DeleteDirectory(parameters.ChocolateyInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
 		CreateDirectory(parameters.NuGetInstallDirectory);
 		CleanDirectory(parameters.NuGetInstallDirectory);
@@ -159,7 +180,7 @@ Task("TestNuGetPackage")
 	.IsDependentOn("InstallNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		new NuGetPackageTester(parameters).RunPackageTests();
+		new NuGetPackageTester(parameters).RunPackageTests(PackageTests);
 	});
 
 Task("BuildChocolateyPackage")
@@ -170,12 +191,11 @@ Task("BuildChocolateyPackage")
 	});
 
 Task("InstallChocolateyPackage")
-	//.IsDependentOn("RemoveNuGetPackageIfPresent") // So both are not present
 	.Does<BuildParameters>((parameters) =>
 	{
 		// Ensure we aren't inadvertently using the nuget install
 		if (DirectoryExists(parameters.NuGetInstallDirectory))
- 			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
+			DeleteDirectory(parameters.NuGetInstallDirectory, new DeleteDirectorySettings() { Recursive = true });
 
 		CreateDirectory(parameters.ChocolateyInstallDirectory);
 		CleanDirectory(parameters.ChocolateyInstallDirectory);
@@ -199,8 +219,48 @@ Task("TestChocolateyPackage")
 	.IsDependentOn("InstallChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
-		new ChocolateyPackageTester(parameters).RunPackageTests();
+		new ChocolateyPackageTester(parameters).RunPackageTests(PackageTests);
 	});
+
+PackageTest[] PackageTests = new PackageTest[]
+{
+	new PackageTest()
+	{
+		Description = "Run mock-assembly",
+		Arguments = $"bin/Release/net20/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		TestConsoleVersions = new [] { "3.10.0", "3.11.1" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+		 	Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0") }
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Run two copies of mock-assembly",
+		Arguments = $"bin/Release/net20/mock-assembly.dll bin/Release/net20/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		TestConsoleVersions = new[] { "3.11.1" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Assemblies = new[] {
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0"),
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0")
+					}
+		}
+	},
+	new PackageTest()
+	{
+		Description = "Run NUnit project with two assemblies",
+		Arguments = $"TwoMockAssemblies.nunit --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		TestConsoleVersions = new[] { "3.11.1" },
+		ExpectedResult = new ExpectedResult("Failed")
+		{
+			Assemblies = new[] {
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0"),
+						 new ExpectedAssemblyResult("mock-assembly.dll", "net-2.0")
+					}
+		}
+	}
+};
 
 //////////////////////////////////////////////////////////////////////
 // PUBLISH
@@ -211,8 +271,8 @@ static bool hadPublishingErrors = false;
 Task("PublishPackages")
 	.Description("Publish nuget and chocolatey packages according to the current settings")
 	.IsDependentOn("PublishToMyGet")
-	// .IsDependentOn("PublishToNuGet")
-	// .IsDependentOn("PublishToChocolatey")
+	.IsDependentOn("PublishToNuGet")
+	.IsDependentOn("PublishToChocolatey")
 	.Does(() =>
 	{
 		if (hadPublishingErrors)
@@ -232,6 +292,44 @@ Task("PublishToMyGet")
 			{
 				PushNuGetPackage(parameters.NuGetPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
 				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.MyGetApiKey, parameters.MyGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToNuGet")
+	.Description("Publish packages to NuGet")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToNuGet)
+			Information("Nothing to publish to NuGet from this run.");
+		else
+			try
+			{
+				PushNuGetPackage(parameters.NuGetPackage, parameters.NuGetApiKey, parameters.NuGetPushUrl);
+			}
+			catch (Exception)
+			{
+				hadPublishingErrors = true;
+			}
+	});
+
+// This task may either be run by the PublishPackages task,
+// which depends on it, or directly when recovering from errors.
+Task("PublishToChocolatey")
+	.Description("Publish packages to Chocolatey")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (!parameters.ShouldPublishToChocolatey)
+			Information("Nothing to publish to Chocolatey from this run.");
+		else
+			try
+			{
+				PushChocolateyPackage(parameters.ChocolateyPackage, parameters.ChocolateyApiKey, parameters.ChocolateyPushUrl);
 			}
 			catch (Exception)
 			{
