@@ -182,3 +182,4 @@ MockAssemblyResult.xml
 PortabilityAnalysis*.html
 tools
 !tools/packages.config
+DraftRelease.md

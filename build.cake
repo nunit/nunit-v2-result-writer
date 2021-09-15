@@ -173,7 +173,7 @@ Task("VerifyNuGetPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		Check.That(parameters.NuGetInstallDirectory,
-			HasFiles("CHANGES.txt", "LICENSE.txt"),
+			HasFiles("CHANGES.md", "LICENSE.txt"),
 			HasDirectory("tools/net20").WithFile("nunit-v2-result-writer.dll"),
 			HasDirectory("tools/netcoreapp2.1").WithFile("nunit-v2-result-writer.dll"));
 		Information("Verification was successful!");
@@ -212,7 +212,7 @@ Task("VerifyChocolateyPackage")
 	.Does<BuildParameters>((parameters) =>
 	{
 		Check.That(parameters.ChocolateyInstallDirectory,
-			HasDirectory("tools").WithFiles("CHANGES.txt", "LICENSE.txt", "VERIFICATION.txt"),
+			HasDirectory("tools").WithFiles("CHANGES.md", "LICENSE.txt", "VERIFICATION.txt"),
 			HasDirectory("tools/net20").WithFile("nunit-v2-result-writer.dll"),
 			HasDirectory("tools/netcoreapp2.1").WithFile("nunit-v2-result-writer.dll"));
 		Information("Verification was successful!");
@@ -355,7 +355,7 @@ Task("CreateDraftRelease")
 			// for both the name of the draft release and the milestone,
 			// i.e. release-2.0.0, release-2.0.0-beta2, etc.
 			string milestone = parameters.BranchName.Substring(8);
-			string releaseName = $"NUnit V2 Result Writer {milestone}";
+			string releaseName = $"NUnit V2 Result Writer Extension {milestone}";
 
 			Information($"Creating draft release...");
 
@@ -382,6 +382,21 @@ Task("CreateDraftRelease")
 		{
 			Information("Skipping Release creation because this is not a release branch");
 		}
+	});
+
+Task("ExportDraftRelease")
+	.Description("Export draft release locally for use in updating CHANGES.md")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (parameters.IsReleaseBranch && parameters.IsLocalBuild)
+		{
+			string milestone = parameters.BranchName.Substring(8);
+
+			GitReleaseManagerExport(parameters.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, "DraftRelease.md",
+				new GitReleaseManagerExportSettings() { TagName = milestone });
+		}
+		else
+			Error("ExportDraftRelease may only be run locally, using a release branch!");
 	});
 
 //////////////////////////////////////////////////////////////////////
