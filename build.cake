@@ -11,6 +11,8 @@
 const string SOLUTION_FILE = "nunit-v2-result-writer.sln";
 const string NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
 const string CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
+const string GITHUB_OWNER = "nunit";
+const string GITHUB_REPO = "nunit-v2-result-writer";
 const string DEFAULT_VERSION = "3.7.0";
 const string DEFAULT_CONFIGURATION = "Release";
 
@@ -335,6 +337,50 @@ Task("PublishToChocolatey")
 			{
 				hadPublishingErrors = true;
 			}
+	});
+
+//////////////////////////////////////////////////////////////////////
+// CREATE A DRAFT RELEASE
+//////////////////////////////////////////////////////////////////////
+
+Task("CreateDraftRelease")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (parameters.IsReleaseBranch)
+		{
+			// NOTE: Since this is a release branch, the pre-release label
+			// is "pre", which we don't want to use for the draft release.
+			// The branch name contains the full information to be used
+			// for both the name of the draft release and the milestone,
+			// i.e. release-2.0.0, release-2.0.0-beta2, etc.
+			string milestone = parameters.BranchName.Substring(8);
+			string releaseName = $"NUnit V2 Result Writer {milestone}";
+
+			Information($"Creating draft release...");
+
+			try
+			{
+				GitReleaseManagerCreate(parameters.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, new GitReleaseManagerCreateSettings()
+				{
+					Name = releaseName,
+					Milestone = milestone
+				});
+			}
+			catch
+			{
+				Error($"Unable to create draft release for {releaseName}.");
+				Error($"Check that there is a {milestone} milestone with at least one closed issue.");
+				Error("");
+				throw;
+			}
+
+			GitReleaseManagerExport(parameters.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, "DraftRelease.md",
+				new GitReleaseManagerExportSettings() { TagName = milestone });
+		}
+		else
+		{
+			Information("Skipping Release creation because this is not a release branch");
+		}
 	});
 
 //////////////////////////////////////////////////////////////////////
