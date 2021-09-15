@@ -1,4 +1,5 @@
 #tool nuget:?package=GitVersion.CommandLine&version=5.0.0
+#tool nuget:?package=GitReleaseManager&version=0.11.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.10.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.11.1
 #tool nuget:?package=NUnit.Extension.NUnitProjectLoader&version=3.6.0
