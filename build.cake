@@ -384,6 +384,30 @@ Task("CreateDraftRelease")
 	});
 
 //////////////////////////////////////////////////////////////////////
+// CREATE A PRODUCTION RELEASE
+//////////////////////////////////////////////////////////////////////
+
+Task("CreateProductionRelease")
+	.Does<BuildParameters>((parameters) =>
+	{
+		if (parameters.IsProductionRelease)
+		{
+			string token = parameters.GitHubAccessToken;
+			string tagName = parameters.PackageVersion;
+			string assets = $"\"{parameters.NuGetPackage},{parameters.ChocolateyPackage}\"";
+
+			Information($"Publishing release {tagName} to GitHub");
+
+			GitReleaseManagerAddAssets(token, GITHUB_OWNER, GITHUB_REPO, tagName, assets);
+			GitReleaseManagerClose(token, GITHUB_OWNER, GITHUB_REPO, tagName);
+		}
+		else
+		{
+			Information("Skipping CreateProductionRelease because this is not a production release");
+		}
+	});
+
+//////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
 
@@ -412,7 +436,9 @@ Task("Appveyor")
 	.IsDependentOn("Build")
 	.IsDependentOn("Test")
 	.IsDependentOn("Package")
-	.IsDependentOn("PublishPackages");
+	.IsDependentOn("PublishPackages")
+	.IsDependentOn("CreateDraftRelease")
+	.IsDependentOn("CreateProductionRelease");
 
 Task("Travis")
 	.IsDependentOn("Build")
