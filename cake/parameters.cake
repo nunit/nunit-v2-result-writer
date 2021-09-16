@@ -1,4 +1,9 @@
-﻿#load "./versioning.cake"
+﻿// ***********************************************************************
+// Copyright (c) Charlie Poole and contributors.
+// Licensed under the MIT License. See LICENSE.txt in root directory.
+// ***********************************************************************
+
+#load "./versioning.cake"
 #load "./packaging.cake"
 #load "./package-checks.cake"
 #load "./package-tests.cake"

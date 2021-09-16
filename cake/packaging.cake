@@ -1,4 +1,9 @@
-﻿using System.Xml;
+﻿// ***********************************************************************
+// Copyright (c) Charlie Poole and contributors.
+// Licensed under the MIT License. See LICENSE.txt in root directory.
+// ***********************************************************************
+
+using System.Xml;
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE METADATA
@@ -9,8 +14,8 @@ static readonly string[] AUTHORS = new[] { "Charlie Poole" };
 static readonly string[] OWNERS = new[] { "Charlie Poole" };
 const string DESCRIPTION = "This extension allows NUnit to create result files in the V2 format, which is used by many CI servers.";
 const string SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 format.";
-const string COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
-static readonly string[] RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.txt" };
+const string COPYRIGHT = "Copyright (c) 2016-2021 Charlie Poole";
+static readonly string[] RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.md" };
 static readonly string[] TAGS = new[] { "nunit", "test", "testing", "tdd", "runner" };
 static readonly Uri PROJECT_URL = new Uri("http://nunit.org");
 static readonly Uri ICON_URL = new Uri("https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png");
@@ -53,7 +58,7 @@ public void BuildNuGetPackage(BuildParameters parameters)
 			KeepTemporaryNuSpecFile = false,
 			Files = new[] {
 					new NuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt" },
-					new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt" },
+					new NuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md" },
 					new NuSpecContent { Source = parameters.ProjectDirectory + "net20.engine.addins", Target = "tools" },
 					new NuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-v2-result-writer.dll", Target = "tools/net20" },
 					new NuSpecContent { Source = parameters.OutputDirectory + "netcoreapp2.1/nunit-v2-result-writer.dll", Target = "tools/netcoreapp2.1" }
@@ -93,7 +98,7 @@ public void BuildChocolateyPackage(BuildParameters parameters)
 			OutputDirectory = parameters.PackageDirectory,
 			Files = new[] {
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "LICENSE.txt", Target = "tools" },
-					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.txt", Target = "tools" },
+					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "CHANGES.md", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "VERIFICATION.txt", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.ProjectDirectory + "net20.engine.addins", Target = "tools" },
 					new ChocolateyNuSpecContent { Source = parameters.OutputDirectory + "net20/nunit-v2-result-writer.dll", Target = "tools/net20" },

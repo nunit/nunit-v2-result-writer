@@ -1,3 +1,8 @@
+// ***********************************************************************
+// Copyright (c) Charlie Poole and contributors.
+// Licensed under the MIT License. See LICENSE.txt in root directory.
+// ***********************************************************************
+
 #load ./assertions.cake
 #load ./constraints.cake
 
