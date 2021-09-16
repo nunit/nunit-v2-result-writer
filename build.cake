@@ -374,9 +374,6 @@ Task("CreateDraftRelease")
 				Error("");
 				throw;
 			}
-
-			GitReleaseManagerExport(parameters.GitHubAccessToken, GITHUB_OWNER, GITHUB_REPO, "DraftRelease.md",
-				new GitReleaseManagerExportSettings() { TagName = milestone });
 		}
 		else
 		{
