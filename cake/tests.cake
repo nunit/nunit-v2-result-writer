@@ -1,3 +1,8 @@
+// ***********************************************************************
+// Copyright (c) Charlie Poole and contributors.
+// Licensed under the MIT License. See LICENSE.txt in root directory.
+// ***********************************************************************
+
 const string NUNIT2_RESULT_SCHEMA = "NUnit2Results.xsd";
 
 public class ResultWriterTests

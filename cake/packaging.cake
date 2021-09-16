@@ -1,4 +1,9 @@
-﻿using System.Xml;
+﻿// ***********************************************************************
+// Copyright (c) Charlie Poole and contributors.
+// Licensed under the MIT License. See LICENSE.txt in root directory.
+// ***********************************************************************
+
+using System.Xml;
 
 //////////////////////////////////////////////////////////////////////
 // PACKAGE METADATA
@@ -9,7 +14,7 @@ static readonly string[] AUTHORS = new[] { "Charlie Poole" };
 static readonly string[] OWNERS = new[] { "Charlie Poole" };
 const string DESCRIPTION = "This extension allows NUnit to create result files in the V2 format, which is used by many CI servers.";
 const string SUMMARY = "NUnit Engine extension for writing test result files in NUnit V2 format.";
-const string COPYRIGHT = "Copyright (c) 2016 Charlie Poole";
+const string COPYRIGHT = "Copyright (c) 2016-2021 Charlie Poole";
 static readonly string[] RELEASE_NOTES = new [] { "See https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/main/CHANGES.md" };
 static readonly string[] TAGS = new[] { "nunit", "test", "testing", "tdd", "runner" };
 static readonly Uri PROJECT_URL = new Uri("http://nunit.org");
