@@ -19,7 +19,7 @@ const string NUGET_ID = "NUnit.Extension.NUnitV2ResultWriter";
 const string CHOCO_ID = "nunit-extension-nunit-v2-result-writer";
 const string GITHUB_OWNER = "nunit";
 const string GITHUB_REPO = "nunit-v2-result-writer";
-const string DEFAULT_VERSION = "3.7.0";
+const string DEFAULT_VERSION = "3.8.0";
 const string DEFAULT_CONFIGURATION = "Release";
 
 // Load scripts after defining constants
