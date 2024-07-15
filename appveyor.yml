@@ -1,11 +1,11 @@
 version: 3.5.{build}
-image: Visual Studio 2017
+image: Visual Studio 2022
 
 build_script:
-  - ps: .\build.ps1 -Target "Appveyor"
+  - ps: .\build.ps1 --target="Appveyor" --configuration="Release"
 
 # disable built-in tests.
-test: off
+test: false
 
 artifacts:
 - path: output\*.nupkg
@@ -19,3 +19,4 @@ environment:
     secure: aDsu1U+umVYFVybjkBVtVQsatSj3QKbD7VkGQci9mNF3493g9Giao/GABISIaHjT
   GITHUB_ACCESS_TOKEN:
     secure: xmGXWrw5Nj3CI3fPxhw/DWIU5YL/1mM06pSmjpkd9LpKs3t3EYXbECbEQs62lU/O
+  IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1  

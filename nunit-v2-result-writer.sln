@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer", "src\extension\nunit-v2-result-writer.csproj", "{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}"
 EndProject
@@ -16,14 +16,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.cmd = build.cmd
 		build.ps1 = build.ps1
 		build.sh = build.sh
-		CHANGES.md = CHANGES.md
 		GitReleaseManager.yaml = GitReleaseManager.yaml
 		GitVersion.yml = GitVersion.yml
 		LICENSE.txt = LICENSE.txt
 		net20.engine.addins = net20.engine.addins
 		NuGet.config = NuGet.config
 		NUnit2Results.xsd = NUnit2Results.xsd
+		nunit_256.png = nunit_256.png
 		README.md = README.md
+		TwoMockAssemblies.nunit = TwoMockAssemblies.nunit
 		VERIFICATION.txt = VERIFICATION.txt
 	EndProjectSection
 EndProject
@@ -43,6 +44,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C60D66FA-F
 		cake\tests.cake = cake\tests.cake
 		cake\utilities.cake = cake\utilities.cake
 		cake\versioning.cake = cake\versioning.cake
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{579E5DBC-8641-4217-80FA-F6AB38FA8192}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\nunit-v2-result-writer.nuspec = nuget\nunit-v2-result-writer.nuspec
+		nuget\nunit-v2-result-writer.legacy.addins = nuget\nunit-v2-result-writer.legacy.addins
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{69F04C16-FD6F-458A-ACB0-0939730E7447}"
+	ProjectSection(SolutionItems) = preProject
+		choco\nunit-v2-result-writer.legacy.addins = choco\nunit-v2-result-writer.legacy.addins
+		choco\nunit-v2-result-writer.nuspec = choco\nunit-v2-result-writer.nuspec
+		choco\VERIFICATION.txt = choco\VERIFICATION.txt
 	EndProjectSection
 EndProject
 Global
@@ -69,6 +83,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
+		{579E5DBC-8641-4217-80FA-F6AB38FA8192} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
+		{69F04C16-FD6F-458A-ACB0-0939730E7447} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9258C05-1EEA-485D-BC8E-69A1D6EFE5DC}

@@ -1,0 +1,4 @@
+# Inclusion of this addins file allows older versions of the console runner
+# to locate extensions in subdirectories of the tools directory.
+net462/nunit-v2-result-writer.dll
+net6.0/nunit-v2-result-writer.dll

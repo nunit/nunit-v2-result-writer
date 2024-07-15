@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>nunit-extension-nunit-v2-result-writer</id>
+    <version>$version$</version>
+    <title>NUnit V2 Result Writer</title>
+	<authors>Charlie Poole</authors>
+	<owners>Charlie Poole</owners>
+	<summary>NUnit engine extension that allows running NUnit projects, which have a file extension of '.nunit'.</summary>
+	<description>This extension allows the engine to run NUnit projects, which have a file extension of '.nunit'.</description>
+	<projectUrl>https://nunit.org</projectUrl>
+    <projectSourceUrl>https://github.com/nunit/nunit-v2-result-writer</projectSourceUrl>
+    <docsUrl>https://github.com/nunit/nunit-v2-result-writer</docsUrl>
+    <bugTrackerUrl>https://github.com/nunit/nunit-v2-result-writer/issues</bugTrackerUrl>
+    <iconUrl>https://cdn.rawgit.com/nunit/resources/master/images/icon/nunit_256.png</iconUrl>
+    <packageSourceUrl>https://github.com/nunit/nunit-v2-result-writer</packageSourceUrl>
+    <releaseNotes>https://docs.nunit.org/articles/nunit/release-notes/console-and-engine.html</releaseNotes>
+    <mailingListUrl>https://groups.google.com/forum/#!forum/nunit-discuss</mailingListUrl>
+    <licenseUrl>https://raw.githubusercontent.com/nunit/nunit-v2-result-writer/master/LICENSE.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <language>en-US</language>
+    <tags>nunit engine extension test testing tdd</tags>
+    <copyright>Copyright (c) 2016-2024 Charlie Poole, Rob Prouse</copyright>
+  </metadata>
+  <files>
+    <file src = "../LICENSE.txt" target = "tools" />
+	<file src ="../nunit_256.png" target="tools" />
+	<file src = "VERIFICATION.txt" target = "tools" />
+    <file src = "nunit-v2-result-writer.legacy.addins" target = "tools" />
+	<file src="$BIN_DIR$net462/nunit-v2-result-writer.dll" target="tools/net462" />
+	<file src="$BIN_DIR$net462/nunit.engine.api.dll" target="tools/net462" />
+	<file src="$BIN_DIR$net6.0/nunit-v2-result-writer.dll" target="tools/net6.0" />
+	<file src="$BIN_DIR$net6.0/nunit.engine.api.dll" target="tools/net6.0" />
+  </files>
+</package>

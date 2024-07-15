@@ -1,2 +1,2 @@
 @echo off
-pwsh ./build.ps1 %CAKE_ARGS% %*
+powershell ./build.ps1 %CAKE_ARGS% %*
