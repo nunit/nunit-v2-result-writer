@@ -1,15 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <!-- If adding/updating TargetFrameworks, also update build.cake -->
-    <TargetFrameworks>net20;netcoreapp2.1</TargetFrameworks>
-    <Configurations>Debug;Release</Configurations>
-    <RootNamespace>NUnit.Engine.Addins</RootNamespace>
-    <AssemblyName>nunit-v2-result-writer</AssemblyName>
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="3.11.1" />
-  </ItemGroup>
+	
+    <PropertyGroup>
+        <!-- If adding/updating TargetFrameworks, also update build.cake -->
+        <TargetFrameworks>net462;net6.0</TargetFrameworks>
+        <Configurations>Debug;Release</Configurations>
+        <RootNamespace>NUnit.Engine.Addins</RootNamespace>
+        <AssemblyName>nunit-v2-result-writer</AssemblyName>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    </PropertyGroup>
+	
+    <ItemGroup>
+        <PackageReference Include="nunit.engine.api" Version="3.11.1" />
+    </ItemGroup>
+	
 </Project>

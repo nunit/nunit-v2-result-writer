@@ -1,7 +1,7 @@
 <NUnitProject>
   <Settings processModel="Default" domainUsage="Default" />
   <Config name="Release" appbase="bin/Release">
-	  <assembly path="net20/mock-assembly.dll" />
-	  <assembly path="net20/mock-assembly.dll" />
+	  <assembly path="net462/mock-assembly.dll" />
+	  <assembly path="net6.0/mock-assembly.dll" />
   </Config>
 </NUnitProject>
