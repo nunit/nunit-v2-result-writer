@@ -2,10 +2,9 @@
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
 #tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
 #tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
-#tool nuget:?package=NUnit.Extension.NUnitProjectLoader&version=3.6.0
 
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=1.0.0-dev00001
+#load nuget:?package=NUnit.Cake.Recipe&version=1.0.1-dev00001
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -16,7 +15,7 @@ BuildSettings.Initialize(
     "nunit-v2-result-writer",
     solutionFile: "nunit-v2-result-writer.sln",
 	unitTestRunner: new NUnitLiteRunner(),
-	unitTests: "**/*.Tests.exe");
+	unitTests: "**/*.tests.exe");
 
 const string NUNIT3_RESULT_FILE = "TestResult.xml";
 const string NUNIT2_RESULT_FILE = "NUnit2TestResult.xml";
@@ -33,7 +32,17 @@ PackageTest[] PackageTests = new PackageTest[]
 		} ),
 	
 	new PackageTest(
-		1, "TwoAssemblies",
+		1, "SingleAssembly_NetCoreRunner",
+		"Run mock-assembly under NetCore runner",
+		$"net6.0/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+		new ExpectedResult("Failed")
+		{
+		 	Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0") }
+		},
+		new IPackageTestRunner[] { (IPackageTestRunner)new NUnitNetCoreConsoleRunner("3.18.0-dev00037") } ),
+	
+	new PackageTest(
+		1, "TwoAssembliesTogether",
 		"Run two copies of mock-assembly",
 		$"net462/mock-assembly.dll net6.0/mock-assembly.dll --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
 		new ExpectedResult("Failed") {
@@ -54,12 +63,15 @@ PackageTest[] PackageTests = new PackageTest[]
 				new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0")
 			}
 		},
-		KnownExtensions.NUnitProjectLoader )
+		KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0") )
 };
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGE
 //////////////////////////////////////////////////////////////////////
+
+private TestRunnerSource DEFAULT_TEST_RUNNER_SOURCE = new TestRunnerSource ( 
+	new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037") );
 
 BuildSettings.Packages.Add(
 	new NuGetPackage(
@@ -72,7 +84,7 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net6.0").WithFile("nunit-v2-result-writer.dll"),
 			HasDirectory("tools/net6.0").WithFile("nunit.engine.api.dll") },
 		tests: PackageTests,
-		testRunnerSource: new TestRunnerSource(new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037"))
+		testRunnerSource: DEFAULT_TEST_RUNNER_SOURCE
 	));
 
 //////////////////////////////////////////////////////////////////////
@@ -89,7 +101,7 @@ BuildSettings.Packages.Add(
 			HasDirectory("tools/net6.0").WithFile("nunit-v2-result-writer.dll"),
 			HasDirectory("tools/net6.0").WithFile("nunit.engine.api.dll") },
 		tests: PackageTests,
-		testRunnerSource: new TestRunnerSource(new NUnitConsoleRunner("3.17.0"), new NUnitConsoleRunner("3.15.5"), new NUnitConsoleRunner("3.18.0-dev00037"))
+		testRunnerSource: DEFAULT_TEST_RUNNER_SOURCE
 	));
 
 //////////////////////////////////////////////////////////////////////
