@@ -79,7 +79,9 @@ namespace NUnit.Engine.Addins
             DateTime start = result.GetAttribute("start-time", DateTime.UtcNow);
             _xmlWriter.WriteAttributeString("date", start.ToString("yyyy-MM-dd"));
             _xmlWriter.WriteAttributeString("time", start.ToString("HH:mm:ss"));
-            WriteEnvironment(assemblies[0].SelectSingleNode("environment")?.GetAttribute("framework-version"));
+            
+            
+            WriteEnvironment(GetFrameworkVersion(assemblies));
             WriteCultureInfo();
         }
 
@@ -91,6 +93,22 @@ namespace NUnit.Engine.Addins
             _xmlWriter.WriteAttributeString("current-uiculture",
                                            CultureInfo.CurrentUICulture.ToString());
             _xmlWriter.WriteEndElement();
+        }
+
+        private string GetFrameworkVersion(XmlNodeList assemblies)
+        {
+            // The nunit2 format requires a framework-version attribute as part of the environment
+            // element. This was an error in the original V2 design, since the various assemblies
+            // do not necessarily use the same framework version. To provide some value, we examine
+            // all the assemblies and return the first non-empty value found.
+            foreach (XmlNode node in assemblies) 
+            { 
+                var version = node.SelectSingleNode("environment")?.GetAttribute("framework-version");
+                if (!string.IsNullOrEmpty(version))
+                    return version;
+            }
+
+            return string.Empty;
         }
 
         private void WriteEnvironment(string frameworkVersion)
