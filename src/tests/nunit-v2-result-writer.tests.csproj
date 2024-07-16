@@ -4,6 +4,7 @@
     <!-- If adding/updating TargetFrameworks, also update build.cake -->
     <!-- Even though we don't support running tests build for netcoreapp2.1 yet, we still build for it -->
     <TargetFrameworks>net462;net6.0</TargetFrameworks>
+	<OutputType>Exe</OutputType>
     <Configurations>Debug;Release</Configurations>
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit-v2-result-writer.tests</AssemblyName>
@@ -16,9 +17,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="nunit.engine.api" Version="3.11.1" />
-
-    <!-- This is the newest NUnit that support .NET Framework 2.0 -->
+    <!-- This is the newest NUnit that supports .NET Framework 2.0 -->
     <PackageReference Include="NUnit" Version="3.11.0" />
+	<PackageReference Include="NUnitLite" Version="3.11.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\extension\nunit-v2-result-writer.csproj" />
