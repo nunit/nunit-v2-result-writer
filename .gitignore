@@ -175,6 +175,7 @@ testCaseCollection.xml
 deploy
 lib
 test-results
+build-results
 package
 output
 images
