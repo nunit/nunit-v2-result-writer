@@ -1,9 +1,6 @@
 ﻿// Copyright (c) Charlie Poole, Rob Prouse and Contributors. MIT License - see LICENSE.txt
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 using NUnit.Framework;
 
 namespace NUnit.Engine.Addins

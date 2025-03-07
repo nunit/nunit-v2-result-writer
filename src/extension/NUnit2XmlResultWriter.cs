@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using System.IO;
 using NUnit.Engine.Extensibility;
+using NUnit.Extensibility;
 
 namespace NUnit.Engine.Addins
 {

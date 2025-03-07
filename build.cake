@@ -1,12 +1,10 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.15.5
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.17.0
-#tool nuget:?package=NUnit.ConsoleRunner&version=3.18.0-dev00037
-#tool nuget:?package=NUnit.ConsoleRunner.NetCore&version=3.18.0-dev00037
+#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-alpha.31
+#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-alpha.31
 
 // Load the recipe
-//#load nuget:?package=NUnit.Cake.Recipe&version=1.3.1-alpha.1
+#load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.5
 // Comment out above line and uncomment below for local tests of recipe changes
-#load ../NUnit.Cake.Recipe/recipe/*.cake
+//#load ../NUnit.Cake.Recipe/recipe/*.cake
 
 // Initialize BuildSettings
 BuildSettings.Initialize(
@@ -39,8 +37,7 @@ PackageTest[] PackageTests = new PackageTest[]
 		ExpectedResult = new ExpectedResult("Failed")
 		{
 		 	Assemblies = new[] { new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0") }
-		},
-		TestRunners = new IPackageTestRunner[] { (IPackageTestRunner)new NUnitNetCoreConsoleRunner("3.18.0-dev00037") }
+		}                                                         
 	},
 	
 	new PackageTest(1, "TwoAssembliesTogether")
@@ -55,30 +52,30 @@ PackageTest[] PackageTests = new PackageTest[]
 		}
 	},
 
-	new PackageTest(1, "NUnitProject")
-	{
-		Description = "Run NUnit project with two assemblies",
-		Arguments = $"../../TwoMockAssemblies.nunit --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
-		ExpectedResult = new ExpectedResult("Failed")
-		{
-			Assemblies = new[] {
-				new ExpectedAssemblyResult("mock-assembly.dll", "net-4.6.2"),
-				new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0")
-			}
-		},
-		ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0") }
-	}
+	// Not currently working... need to fix in version 3.9.0 of NUnitProjectLoader
+	//new PackageTest(1, "NUnitProject")
+	//{
+	//	Description = "Run NUnit project with two assemblies",
+	//	Arguments = $"../../TwoMockAssemblies.nunit --result={NUNIT3_RESULT_FILE} --result={NUNIT2_RESULT_FILE};format=nunit2",
+	//	ExpectedResult = new ExpectedResult("Failed")
+	//	{
+	//		Assemblies = new[] {
+	//			new ExpectedAssemblyResult("mock-assembly.dll", "net-4.6.2"),
+	//			new ExpectedAssemblyResult("mock-assembly.dll", "netcore-6.0")
+	//		}
+	//	},
+	//	ExtensionsNeeded = new[] { KnownExtensions.NUnitProjectLoader.SetVersion("3.8.0") }
+	//}
 };
 
 //////////////////////////////////////////////////////////////////////
 // NUGET PACKAGE
 //////////////////////////////////////////////////////////////////////
 
-private IPackageTestRunner[] DEFAULT_TEST_RUNNERS = new[]
+private IPackageTestRunner[] DEFAULT_TEST_RUNNERS = new IPackageTestRunner[]
 {
-	new NUnitConsoleRunner("3.17.0"),
-	new NUnitConsoleRunner("3.15.5"),
-	new NUnitConsoleRunner("3.18.0-dev00037")
+	new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-alpha.31"),
+	new NUnit4DotNetRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-alpha.31")
 };
 
 BuildSettings.Packages.Add(
