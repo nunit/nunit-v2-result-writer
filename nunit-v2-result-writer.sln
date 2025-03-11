@@ -48,8 +48,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C60D66FA-F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{579E5DBC-8641-4217-80FA-F6AB38FA8192}"
 	ProjectSection(SolutionItems) = preProject
-		nuget\nunit-v2-result-writer.nuspec = nuget\nunit-v2-result-writer.nuspec
 		nuget\nunit-v2-result-writer.legacy.addins = nuget\nunit-v2-result-writer.legacy.addins
+		nuget\nunit-v2-result-writer.nuspec = nuget\nunit-v2-result-writer.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{69F04C16-FD6F-458A-ACB0-0939730E7447}"
@@ -57,6 +57,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{69F04C16
 		choco\nunit-v2-result-writer.legacy.addins = choco\nunit-v2-result-writer.legacy.addins
 		choco\nunit-v2-result-writer.nuspec = choco\nunit-v2-result-writer.nuspec
 		choco\VERIFICATION.txt = choco\VERIFICATION.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{E03BD3E6-F600-498A-8FCD-D77EA8E38E81}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{0C604EAB-A6F9-4ACD-83AC-3E066CBDC6DE}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\NUnitV2ResultWriter.CI.yml = .github\workflows\NUnitV2ResultWriter.CI.yml
 	EndProjectSection
 EndProject
 Global
@@ -85,6 +92,8 @@ Global
 		{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 		{579E5DBC-8641-4217-80FA-F6AB38FA8192} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 		{69F04C16-FD6F-458A-ACB0-0939730E7447} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
+		{E03BD3E6-F600-498A-8FCD-D77EA8E38E81} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
+		{0C604EAB-A6F9-4ACD-83AC-3E066CBDC6DE} = {E03BD3E6-F600-498A-8FCD-D77EA8E38E81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9258C05-1EEA-485D-BC8E-69A1D6EFE5DC}
