@@ -13,7 +13,8 @@
     </PropertyGroup>
 	
     <ItemGroup>
-        <PackageReference Include="nunit.engine.api" Version="3.11.1" />
-    </ItemGroup>
+		<PackageReference Include="nunit.engine.api" Version="4.0.0-beta.1.1" />
+		<PackageReference Include="nunit.extensibility.api" Version="4.0.0-beta.1.1" />
+	</ItemGroup>
 	
 </Project>
