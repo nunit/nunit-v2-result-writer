@@ -16,7 +16,7 @@
     <None Remove="Results.xsd" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="nunit.engine.api" Version="4.0.0-alpha.31" />
+    <PackageReference Include="nunit.engine.api" Version="4.0.0-beta.1.1" />
     <!-- This is the newest NUnit that supports .NET Framework 2.0 -->
     <PackageReference Include="NUnit" Version="3.11.0" />
 	<PackageReference Include="NUnitLite" Version="3.11.0" />

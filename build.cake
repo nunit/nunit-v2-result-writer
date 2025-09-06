@@ -1,5 +1,5 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-alpha.31
-#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-alpha.31
+#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-beta.1.1
+#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.1
 
 // Load the recipe
 #load nuget:?package=NUnit.Cake.Recipe&version=1.4.0-alpha.5
