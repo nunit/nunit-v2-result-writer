@@ -1,5 +1,6 @@
 # The labels that will be used to include issues in release notes.
 issue-labels-include:
+- Breaking Change
 - Feature
 - Enhancement
 - Bug
