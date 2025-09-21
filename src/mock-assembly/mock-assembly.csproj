@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <RootNamespace>NUnit.Tests</RootNamespace>
-    <TargetFrameworks>net462;net6.0</TargetFrameworks>
-    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="NUnit" Version="3.11.0" />
-  </ItemGroup>
+
+	<PropertyGroup>
+        <RootNamespace>NUnit.Tests</RootNamespace>
+        <TargetFrameworks>net462;net6.0</TargetFrameworks>
+    </PropertyGroup>
+	
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="$(NUnitVersion)" />
+    </ItemGroup>
+	
 </Project>
