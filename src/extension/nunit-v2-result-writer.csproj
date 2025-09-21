@@ -8,7 +8,6 @@
         <RootNamespace>NUnit.Engine.Addins</RootNamespace>
         <AssemblyName>nunit-v2-result-writer</AssemblyName>
         <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     </PropertyGroup>
 	

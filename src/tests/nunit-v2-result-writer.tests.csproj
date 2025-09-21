@@ -9,7 +9,6 @@
     <RootNamespace>NUnit.Engine.Tests</RootNamespace>
     <AssemblyName>nunit-v2-result-writer.tests</AssemblyName>
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
@@ -23,6 +22,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\extension\nunit-v2-result-writer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
