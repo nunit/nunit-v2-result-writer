@@ -1,8 +1,8 @@
-#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-beta.1.1
-#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.1
+#tool nuget:?package=NUnit.ConsoleRunner&version=4.0.0-beta.1.45
+#tool dotnet:?package=NUnit.ConsoleRunner.NetCore&version=4.0.0-beta.1.45
 
 // Load the recipe
-#load nuget:?package=NUnit.Cake.Recipe&version=1.5.1-alpha.1
+#load nuget:?package=NUnit.Cake.Recipe&version=2.0.0-beta.1
 // Comment out above line and uncomment below for local tests of recipe changes
 //#load ../NUnit.Cake.Recipe/recipe/*.cake
 
@@ -18,8 +18,8 @@ BuildSettings.Initialize(
 const string NUNIT3_RESULT_FILE = "TestResult.xml";
 const string NUNIT2_RESULT_FILE = "NUnit2TestResult.xml";
 
-IPackageTestRunner StandardRunner = new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-beta.1.1");
-IPackageTestRunner DotNetRunner = new NUnit4DotNetRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-beta.1");
+IPackageTestRunner StandardRunner = new NUnitConsoleRunner("NUnit.ConsoleRunner", "4.0.0-beta.1.45");
+IPackageTestRunner DotNetRunner = new NUnit4DotNetRunner("NUnit.ConsoleRunner.NetCore", "4.0.0-beta.1.45");
 
 PackageTest[] PackageTests = new PackageTest[]
 {
@@ -80,7 +80,7 @@ PackageTest[] PackageTests = new PackageTest[]
 BuildSettings.Packages.Add(
 	new NuGetPackage(
 		"NUnit.Extension.NUnitV2ResultWriter",
-		"nuget/nunit-v2-result-writer.nuspec",
+		source: "nuget/nunit-v2-result-writer.nuspec",
 		checks: new PackageCheck[] {
 			HasFiles("LICENSE.txt", "nunit_256.png"),
 			HasDirectory("tools/net462").WithFile("nunit-v2-result-writer.dll"),
@@ -98,7 +98,7 @@ BuildSettings.Packages.Add(
 BuildSettings.Packages.Add(
 	new ChocolateyPackage(
 		"nunit-extension-nunit-v2-result-writer",
-		"choco/nunit-v2-result-writer.nuspec",
+		source: "choco/nunit-v2-result-writer.nuspec",
 		checks: new PackageCheck[] {
 			HasDirectory("tools").WithFiles("LICENSE.txt", "VERIFICATION.txt", "nunit_256.png", "nunit-v2-result-writer.legacy.addins"),
 			HasDirectory("tools/net462").WithFile("nunit.engine.api.dll"),
@@ -123,33 +123,33 @@ BuildSettings.Packages.Add(
 
 // TODO: Check the internal format of the files.
 
-TaskTeardown(teardownContext =>
-{
-	if (teardownContext.Task.Name == "Package")
-	{
-		Banner.Display("Check the NUnit2 format result files", '=', 78);
+//TaskTeardown(teardownContext =>
+//{
+//	if (teardownContext.Task.Name == "Package")
+//	{
+//		Banner.Display("Check the NUnit2 format result files", '=', 78);
 
-		foreach(var package in BuildSettings.Packages)
-		{
-			Banner.Display( package.PackageFileName );
+//		foreach(var package in BuildSettings.Packages)
+//		{
+//			Banner.Display( package.PackageFileName );
 
-			//Console.WriteLine( package.PackageResultDirectory);
-			int index = 0;
-			foreach (var dir in teardownContext.GetDirectories(package.PackageResultDirectory + "*"))
-			{
-				var nunit2ResultFile = dir.CombineWithFilePath("NUnit2TestResult.xml");
-				Console.WriteLine($"{++index}. {dir.GetDirectoryName()}");
-				Console.WriteLine();
+//			//Console.WriteLine( package.PackageResultDirectory);
+//			int index = 0;
+//			foreach (var dir in teardownContext.GetDirectories(package.PackageResultDirectory + "*"))
+//			{
+//				var nunit2ResultFile = dir.CombineWithFilePath("NUnit2TestResult.xml");
+//				Console.WriteLine($"{++index}. {dir.GetDirectoryName()}");
+//				Console.WriteLine();
 
-				if (SIO.File.Exists($"{nunit2ResultFile}"))
-					Console.WriteLine("  SUCCESS: NUnit2 Test Result FOUND");
-				else
-					Console.WriteLine("  FAILED: NUnit2 TestResult NOT FOUND");
-				Console.WriteLine();
-			}
-		}
-	}
-});
+//				if (SIO.File.Exists($"{nunit2ResultFile}"))
+//					Console.WriteLine("  SUCCESS: NUnit2 Test Result FOUND");
+//				else
+//					Console.WriteLine("  FAILED: NUnit2 TestResult NOT FOUND");
+//				Console.WriteLine();
+//			}
+//		}
+//	}
+//});
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
