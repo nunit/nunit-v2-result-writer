@@ -9,10 +9,10 @@
       ],
       "rollForward": false
     },
-    "gitversion.tool": {
-      "version": "6.4.0",
+    "minver-cli": {
+      "version": "4.0.0",
       "commands": [
-        "dotnet-gitversion"
+        "minver"
       ],
       "rollForward": false
     },

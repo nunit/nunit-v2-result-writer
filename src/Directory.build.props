@@ -22,7 +22,7 @@
 		<DebugType>portable</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 		<!-- Commonly Used Package Versions -->
-		<EngineVersion>4.0.0-beta.1.45</EngineVersion>
+		<EngineVersion>4.0.0-beta.2.3</EngineVersion>
 		<AnnotatedReferenceAssemblyVersion>8.0.0</AnnotatedReferenceAssemblyVersion>
 		<!-- Informational Settings -->
 		<Company>NUnit Software</Company>

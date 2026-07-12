@@ -1,8 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34525.116
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer", "src\extension\nunit-v2-result-writer.csproj", "{AECFA3FB-E55A-4151-9DEA-F715FBB972BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "nunit-v2-result-writer.tests", "src\tests\nunit-v2-result-writer.tests.csproj", "{9A2892BF-2E7A-4D32-8ED9-3971A9EB959E}"
@@ -17,7 +14,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build.ps1 = build.ps1
 		build.sh = build.sh
 		GitReleaseManager.yaml = GitReleaseManager.yaml
-		GitVersion.yml = GitVersion.yml
 		LICENSE.txt = LICENSE.txt
 		net20.engine.addins = net20.engine.addins
 		NuGet.config = NuGet.config
@@ -29,22 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mock-assembly", "src\mock-assembly\mock-assembly.csproj", "{6D160D73-AB70-47F3-9837-BB3A06125FFB}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cake", "cake", "{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21}"
-	ProjectSection(SolutionItems) = preProject
-		cake\assertions.cake = cake\assertions.cake
-		cake\constraints.cake = cake\constraints.cake
-		cake\package-checks.cake = cake\package-checks.cake
-		cake\package-tests.cake = cake\package-tests.cake
-		cake\packaging.cake = cake\packaging.cake
-		cake\parameters.cake = cake\parameters.cake
-		cake\test-reports.cake = cake\test-reports.cake
-		cake\test-results.cake = cake\test-results.cake
-		cake\test-runner.cake = cake\test-runner.cake
-		cake\tests.cake = cake\tests.cake
-		cake\utilities.cake = cake\utilities.cake
-		cake\versioning.cake = cake\versioning.cake
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{579E5DBC-8641-4217-80FA-F6AB38FA8192}"
 	ProjectSection(SolutionItems) = preProject
@@ -89,7 +69,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C60D66FA-F4D4-46BE-9B1C-EFBCB344CA21} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 		{579E5DBC-8641-4217-80FA-F6AB38FA8192} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 		{69F04C16-FD6F-458A-ACB0-0939730E7447} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
 		{E03BD3E6-F600-498A-8FCD-D77EA8E38E81} = {5F2D8428-EF74-449E-ADD6-505D20751D12}
